@@ -135,6 +135,8 @@ test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /usr/include/opencv4
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/pack.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/test_stream_node.cpp
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/cv_bridge/cv_bridge.h
+test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/geometry_msgs/Quaternion.h
+test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/geometry_msgs/Vector3.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/image_transport/camera_publisher.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/image_transport/camera_subscriber.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/image_transport/exception.h
@@ -204,6 +206,7 @@ test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/sensor_msgs/CameraInfo.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/sensor_msgs/CompressedImage.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/sensor_msgs/Image.h
+test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/sensor_msgs/Imu.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/sensor_msgs/RegionOfInterest.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/sensor_msgs/image_encodings.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/std_msgs/Header.h

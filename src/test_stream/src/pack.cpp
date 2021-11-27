@@ -64,6 +64,20 @@ static float *quaternion_mult(const float q[4], const float r[4]) {
     ret[3] = r0 * q3 - r1 * q2 + r2 * q1 + r3 * q0;
     return ret;
 }
+static float *quaternion_inverse(const float q[4]){
+     static float ret[4];
+    // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
+    float q0 = q[0];
+    float q1 = q[1];
+    float q2 = q[2];
+    float q3 = q[3];
+   
+    ret[0] = q0;
+    ret[1] = -q1;
+    ret[2] = -q2;
+    ret[3] = -q3;
+    return ret;
+}
 float *CreateFromYawPitchRoll(float yaw, float pitch,
                               float roll)  // yaw (Z), pitch (Y), roll (X)
 {

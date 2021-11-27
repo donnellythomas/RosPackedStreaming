@@ -10,7 +10,7 @@ project(test_stream)
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 find_package(catkin REQUIRED
-roscpp std_msgs image_transport cv_bridge)
+roscpp std_msgs image_transport cv_bridge sensor_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)

@@ -136,6 +136,8 @@ test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o
  /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/pack.h
  /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/test_stream_node.cpp
  /opt/ros/noetic/include/cv_bridge/cv_bridge.h
+ /opt/ros/noetic/include/geometry_msgs/Quaternion.h
+ /opt/ros/noetic/include/geometry_msgs/Vector3.h
  /opt/ros/noetic/include/image_transport/camera_publisher.h
  /opt/ros/noetic/include/image_transport/camera_subscriber.h
  /opt/ros/noetic/include/image_transport/exception.h
@@ -205,6 +207,7 @@ test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o
  /opt/ros/noetic/include/sensor_msgs/CameraInfo.h
  /opt/ros/noetic/include/sensor_msgs/CompressedImage.h
  /opt/ros/noetic/include/sensor_msgs/Image.h
+ /opt/ros/noetic/include/sensor_msgs/Imu.h
  /opt/ros/noetic/include/sensor_msgs/RegionOfInterest.h
  /opt/ros/noetic/include/sensor_msgs/image_encodings.h
  /opt/ros/noetic/include/std_msgs/Header.h
