@@ -2,52 +2,23 @@
 #include <opencv2/opencv.hpp>
 #include <chrono>
 #include "pack.h"
+
+#include <thread>
 using namespace std::chrono;
 using namespace std;
 using namespace cv;
-
-const float CUBESIZE = 16*20;
-Mat importImage(String path) {
-    Mat image = imread(path, CV_32F);
-    if (!image.data) {
-        printf("No image data \n");
-    }
-    return image;
+Pack::Pack(Mat m, float r[4]){          
+    mat = m;
+    rotation[0] = r[0];
+    rotation[1] = r[1];
+    rotation[2] = r[2];
+    rotation[3] = r[3];
+    uvStore = precompute();
 }
-// float faceTransform[6][2] = {{0, 0},         {M_PI / 2, 0},  {M_PI, 0},
-//                              {-M_PI / 2, 0}, {0, -M_PI / 2}, {0, M_PI / 2}}; // front right back left top bottom
-float faceTransform[6][2] = {{-M_PI / 2, 0},{0, 0},{M_PI / 2, 0},{M_PI, 0}, {0, -M_PI / 2}, {0, M_PI / 2}}; // left front right back top bottom
-float packedCoords[14][2] = {
-        {CUBESIZE*4,0},             //leftTop
-        {0,0},                      //left                   
-        {CUBESIZE*4,CUBESIZE/16},   //leftBottom
-        {CUBESIZE*4,CUBESIZE/16*2}, //frontTop
-        {CUBESIZE,0},               //front
-        {CUBESIZE*4,CUBESIZE/16*3}, //frontBot
-        {CUBESIZE*4,CUBESIZE/16*4}, //rightTop
-        {CUBESIZE*2,0},             //right
-        {CUBESIZE*4,CUBESIZE/16*5}, //rightBott
-        {CUBESIZE*4,CUBESIZE/16*6}, //backTop
-        {CUBESIZE*3,0},             //back
-        {CUBESIZE*4,CUBESIZE/16*7}, //backBott
-        {CUBESIZE*4+CUBESIZE/4,0},  //top
-        {CUBESIZE*4+CUBESIZE/4,CUBESIZE/4}}; //bott
-    float cubeCoords[14][2] = {
-        {CUBESIZE*3,CUBESIZE},          //leftTop
-        {CUBESIZE*3, CUBESIZE*1.25f},   //left
-        {CUBESIZE*3,CUBESIZE*1.75f},    //leftBottom
-        {0,CUBESIZE},                   //frontTop
-        {0,CUBESIZE*1.25f},             //front
-        {0,CUBESIZE*1.75f},             //frontBottom
-        {CUBESIZE,CUBESIZE},            //rightTop
-        {CUBESIZE, CUBESIZE*1.25f},     //right
-        {CUBESIZE,CUBESIZE*1.75f},      //rightBottom
-        {CUBESIZE*2,CUBESIZE},          //backTop
-        {CUBESIZE*2, CUBESIZE*1.25f},   //back
-        {CUBESIZE*2,CUBESIZE*1.75f},    //backBottom
-        {CUBESIZE,0},                   //top
-        {CUBESIZE,CUBESIZE*2} };        //bottom
-static float *quaternion_mult(const float q[4], const float r[4]) {
+float*** precompute(){
+    
+}
+ float *Pack::quaternion_mult(const float q[4], const float r[4]) {
     static float ret[4];
     // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
     float q0 = q[0];
@@ -64,7 +35,7 @@ static float *quaternion_mult(const float q[4], const float r[4]) {
     ret[3] = r0 * q3 - r1 * q2 + r2 * q1 + r3 * q0;
     return ret;
 }
-static float *quaternion_inverse(const float q[4]){
+ float *Pack::quaternion_inverse(const float q[4]){
      static float ret[4];
     // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
     float q0 = q[0];
@@ -78,7 +49,7 @@ static float *quaternion_inverse(const float q[4]){
     ret[3] = -q3;
     return ret;
 }
-float *CreateFromYawPitchRoll(float yaw, float pitch,
+float* Pack::CreateFromYawPitchRoll(float yaw, float pitch,
                               float roll)  // yaw (Z), pitch (Y), roll (X)
 {
     // Abbreviations for the various angular functions
@@ -107,7 +78,100 @@ float *CreateFromYawPitchRoll(float yaw, float pitch,
     rotation[3] = m_z;
     return rotation;
 }
-float *new_rotation(float u, float v, float *rotation, float inHeight,
+void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, int faceType, float rotation[4]){
+    
+    
+    // Calculate adjacent (ak) and opposite (an) of the
+    // triangle that is spanned from the sphere center
+    // to our cube face.
+    float inWidth = in.cols;
+    float inHeight = in.rows;
+    float width = face.cols;
+    float height = face.rows;
+    Mat mx(height,width,CV_32F);
+    Mat my(height,width,CV_32F);
+    float ftu = faceTransform[faceID][0];
+    float ftv = faceTransform[faceID][1];
+
+    //determine start and end points based on face type 
+    int start = 0;
+    int end = height;
+    if(faceType == 2){ //MID
+        start = CUBESIZE/4;
+        end = height + CUBESIZE/4;
+    }
+    if(faceType == 3){ //bott
+        start = width*0.75;
+        end = height + width*0.75;
+    }
+    for (int y = 0; y < width; y++) {
+        for (int x = start; x < end; x++) {
+            // Map face pixel coordinates to [-1, 1] on plane
+            float nx = ((float)(y) / width - 0.5f);
+            float ny = ((float)(x) / width - 0.5f);
+            nx *= 2;
+            ny *= 2;
+            nx *= AN;
+            ny *= AN;
+
+            float u, v;
+
+            if (ftv == 0) {
+                // Center faces
+                u = atan2(nx, AK);
+                v = atan2(ny * cos(u), AK);
+                u += ftu;
+            } else if (ftv > 0) {
+                // Bottom face
+                float d = sqrt(nx * nx + ny * ny);
+                v = M_PI / 2 - atan2(d, AK);
+                u = atan2(ny, nx);
+            } else {
+                // Top face
+                float d = sqrt(nx * nx + ny * ny);
+                v = -M_PI / 2 + atan2(d, AK);
+                u = atan2(-ny, nx);
+            }
+
+            u = u / (M_PI);
+            v = v / (M_PI / 2);
+
+            // Warp around, if our coordinates are out of bounds.
+            while (v < -1) {
+                v += 2;
+                u += 1;
+            }
+            while (v > 1) {
+                v -= 2;
+                u += 1;
+            }
+
+            while (u < -1) {
+                u += 2;
+            }
+            while (u > 1) {
+                u -= 2;
+            }
+
+            u = u / 2.0f + 0.5f;
+            v = v / 2.0f + 0.5f;
+            
+            float *uv;
+            uv = new_rotation(u, v, (float *)rotation, inHeight - 1,
+                              inWidth - 1);
+            u = uv[0];
+            v = uv[1];
+
+            mx.at<float>(x-start, y) = u;
+            my.at<float>(x-start, y) = v;
+        }
+    }
+   
+    remap(in, face, mx, my, INTER_LINEAR, BORDER_CONSTANT,
+          Scalar(0, 0, 0));
+
+} 
+float *Pack::new_rotation(float u, float v, float *rotation, float inHeight,
                     float inWidth) {
     // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
@@ -142,107 +206,7 @@ float *new_rotation(float u, float v, float *rotation, float inHeight,
 
     return uv;
 }
-inline void computeFaceMap(Mat &in, Mat &face, int faceID, int faceType, float rotation[4]){
-    
-    
-    // Calculate adjacent (ak) and opposite (an) of the
-    // triangle that is spanned from the sphere center
-    // to our cube face.
-    float inWidth = in.cols;
-    float inHeight = in.rows;
-    float width = face.cols;
-    float height = face.rows;
-    Mat mx(height,width,CV_32F);
-    Mat my(height,width,CV_32F);
-    const float an = sin(M_PI / 4);
-    const float ak = cos(M_PI / 4);
-    float ftu = faceTransform[faceID][0];
-    float ftv = faceTransform[faceID][1];
-
-    // For each point in the target image,
-    // calculate the corresponding source coordinates.
-    int start = 0;
-    int end = height;
-    if(faceType == 2){ //MID
-        start = CUBESIZE/4;
-        end = height + CUBESIZE/4;
-    }
-    if(faceType == 3){ //bott
-        start = width*0.75;
-        end = height + width*0.75;
-    }
-
-    for (int y = 0; y < width; y++) {
-        for (int x = start; x < end; x++) {
-            // Map face pixel coordinates to [-1, 1] on plane
-            float nx = ((float)(y) / width - 0.5f);
-            float ny = ((float)(x) / width - 0.5f);
-
-            // printf("test");
-            nx *= 2;
-            ny *= 2;
-            nx *= an;
-            ny *= an;
-
-            float u, v;
-
-            if (ftv == 0) {
-                // Center faces
-                u = atan2(nx, ak);
-                v = atan2(ny * cos(u), ak);
-                u += ftu;
-            } else if (ftv > 0) {
-                // Bottom face
-                float d = sqrt(nx * nx + ny * ny);
-                v = M_PI / 2 - atan2(d, ak);
-                u = atan2(ny, nx);
-            } else {
-                // Top face
-                float d = sqrt(nx * nx + ny * ny);
-                v = -M_PI / 2 + atan2(d, ak);
-                u = atan2(-ny, nx);
-            }
-
-            u = u / (M_PI);
-            v = v / (M_PI / 2);
-
-            // Warp around, if our coordinates are out of bounds.
-            while (v < -1) {
-                v += 2;
-                u += 1;
-            }
-            while (v > 1) {
-                v -= 2;
-                u += 1;
-            }
-
-            while (u < -1) {
-                u += 2;
-            }
-            while (u > 1) {
-                u -= 2;
-            }
-
-            u = u / 2.0f + 0.5f;
-            v = v / 2.0f + 0.5f;
-
-            float *uv;
-            uv = new_rotation(u, v, (float *)rotation, inHeight - 1,
-                              inWidth - 1);
-            u = uv[0];
-            v = uv[1];
-
-            mx.at<float>(x-start, y) = u;
-            my.at<float>(x-start, y) = v;
-        }
-    }
-   
-    remap(in, face, mx, my, INTER_LINEAR, BORDER_CONSTANT,
-          Scalar(0, 0, 0));
-
-} 
-
-Mat pack(Mat &in, float rotation[4]){
+Mat Pack::pack(Mat &in, float rotation[4]){
     Mat packedFaces[14];
     int j = 0;
     auto start = high_resolution_clock::now();
@@ -269,12 +233,95 @@ Mat pack(Mat &in, float rotation[4]){
     }
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
-    cout << duration.count() << endl;
+    // cout << duration.count() << endl;
 
     return packed;
 }
 
+Mat Pack::pack2(Mat &in, float rotation[4]){
+    Mat packedFaces[14];
+    int j = 0;
+    auto start = high_resolution_clock::now();
+    
+    for(int i = 0;i<12;i++){
+        packedFaces[i] = Mat(CUBESIZE*0.1f, CUBESIZE*0.4f,in.type());
+        computeFaceMap(in, packedFaces[i], j,0,rotation);
+        
+        i++;
 
+        packedFaces[i] = Mat(CUBESIZE/2, CUBESIZE, in.type());
+        computeFaceMap(in, packedFaces[i], j,2, rotation);
+        i++;
+
+        packedFaces[i] = Mat(CUBESIZE*0.1f, CUBESIZE*0.4f,in.type());
+        computeFaceMap(in, packedFaces[i], j,3,rotation);
+        j++;
+    }
+    packedFaces[12] = Mat(CUBESIZE*0.2f, CUBESIZE*0.2f,in.type());
+    computeFaceMap(in, packedFaces[12], 4,0,rotation);
+    packedFaces[13] = Mat(CUBESIZE*0.2f, CUBESIZE*0.2f,in.type());
+    computeFaceMap(in, packedFaces[13], 5,0,rotation);
+
+    Mat packed(CUBESIZE, CUBESIZE*2+CUBESIZE*0.4f, in.type());
+    for(int i = 0; i <14; i++){
+        packedFaces[i].copyTo(packed(Rect(packedCoords2[i][0],  packedCoords2[i][1],packedFaces[i].cols, packedFaces[i].rows)));
+    }
+    // namedWindow("face", cv::WINDOW_NORMAL);
+    // resizeWindow("face", Size(768,384));
+    // imshow("face", packed);
+    // waitKey(0);
+    // exit(0);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(stop - start);
+    // cout << duration.count() << endl;
+
+    return packed;
+}
+// Mat Pack::pack3(Mat &in, float rotation[4]){
+//     Mat packedFaces[14];
+//     int j = 0;
+//     int t = 0;
+//     std::thread myThreads[14];
+//     for(int i = 0;i<12;i++){
+//         packedFaces[i] = Mat(CUBESIZE*0.1f, CUBESIZE*0.4f,in.type());
+//         myThreads[t] = std::thread(computeFaceMap, std::ref(in),std::ref( packedFaces[i]), j,0,rotation);
+//         t++;        
+//         i++;
+
+//         packedFaces[i] = Mat(CUBESIZE/2, CUBESIZE, in.type());
+//         myThreads[t] = std::thread(Pack::computeFaceMap, std::ref(in),std::ref( packedFaces[i]), j,2,rotation);
+//         t++;
+//         i++;
+
+//         packedFaces[i] = Mat(CUBESIZE*0.1f, CUBESIZE*0.4f,in.type());
+//         myThreads[t] = std::thread(Pack::computeFaceMap, std::ref(in),std::ref( packedFaces[i]), j,3,rotation);
+//         t++;
+//         j++;
+//     }
+//     packedFaces[12] = Mat(CUBESIZE*0.2f, CUBESIZE*0.2f,in.type());
+//     myThreads[t] = std::thread(Pack::computeFaceMap, std::ref(in), std::ref(packedFaces[12]), j,0,rotation);
+//     t++;
+//     packedFaces[13] = Mat(CUBESIZE*0.2f, CUBESIZE*0.2f,in.type());
+//     myThreads[t] = std::thread(Pack::computeFaceMap, std::ref(in), std::ref(packedFaces[13]), j,0,rotation);
+//     for(int i = 0; i < 14; i++){
+//         myThreads[i].join();
+//     }
+//     Mat packed(CUBESIZE, CUBESIZE*2+CUBESIZE*0.4f, in.type());
+//     auto start = high_resolution_clock::now();
+//     for(int i = 0; i <14; i++){
+//         packedFaces[i].copyTo(packed(Rect(packedCoords2[i][0],  packedCoords2[i][1],packedFaces[i].cols, packedFaces[i].rows)));
+//     }
+//     auto stop = high_resolution_clock::now();
+//     auto duration = duration_cast<milliseconds>(stop - start);
+//     cout << duration.count() << endl;
+//     // namedWindow("face", cv::WINDOW_NORMAL);
+//     // resizeWindow("face", Size(768,384));
+//     // imshow("face", packed);
+//     // waitKey(0);
+//     // exit(0);
+
+//     return packed;
+// }
 
 // TODO
 // include interface for rotation
@@ -282,3 +329,5 @@ Mat pack(Mat &in, float rotation[4]){
 // reimplement video
 // streaming
     // Figure out bitrate
+
+    

@@ -133,7 +133,7 @@ ${OpenCV_INCLUDE_DIRS}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/test_stream_node.cpp src/pack.cpp src/pack.h)
+add_executable(${PROJECT_NAME}_node src/test_stream_node.cpp src/pack.cpp src/pack.h )
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
