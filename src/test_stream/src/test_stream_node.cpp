@@ -34,14 +34,14 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   cv::Mat out = cvImg->image;
   auto start = std::chrono::high_resolution_clock::now();
   Pack packed;
-  packed.pack2(out, rotation);
+  packed.pack(out, rotation);
   // cv::Mat packed = pack2(out,rotation);
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   ROS_INFO("Pack time: %ld",duration.count());
   std::string dt = std::to_string(timestamp);
   timestamp++;
-  cv::putText(packed.mat, 
+  cv::putText(packed.packed, 
               dt,
               cv::Size(10, 100),
               cv::FONT_HERSHEY_SCRIPT_COMPLEX, 1,
@@ -49,8 +49,8 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
               4, cv::LINE_8);
     // namedWindow("face", cv::WINDOW_NORMAL);
     // resizeWindow("face", Size(768,384));
-    imshow("face", packed.mat);
-    ROS_INFO("Height: %d, Width: %d", packed.mat.rows, packed.mat.cols);
+    imshow("face", packed.packed);
+    ROS_INFO("Height: %d, Width: %d", packed.packed.rows, packed.packed.cols);
 
     waitKey(1);
     // exit(0);
