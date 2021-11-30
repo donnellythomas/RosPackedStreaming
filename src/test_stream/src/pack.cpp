@@ -7,17 +7,20 @@
 using namespace std::chrono;
 using namespace std;
 using namespace cv;
-Pack::Pack(Mat m, float r[4]){          
-    mat = m;
-    rotation[0] = r[0];
-    rotation[1] = r[1];
-    rotation[2] = r[2];
-    rotation[3] = r[3];
-    uvStore = precompute();
-}
-float*** precompute(){
+Pack::Pack(void){          
     
 }
+float*** precompute(Mat &in){
+    
+    float width[] = { 192, 480, 192, 192, 480, 192, 192, 480, 192, 192, 480, 192, 96, 96};
+    float height[] =  {48, 240, 48, 48, 240, 48, 48, 240, 48, 48, 240, 48, 96, 96};
+
+    //TODO figure out inheight inWidth, faceHeight, and faceWidth, of each faceType
+    //figure out how to map computeFaceMap based on its varyables
+
+    //I sure hope this makes things faster  
+}
+
  float *Pack::quaternion_mult(const float q[4], const float r[4]) {
     static float ret[4];
     // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
@@ -88,6 +91,9 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, int faceType, float ro
     float inHeight = in.rows;
     float width = face.cols;
     float height = face.rows;
+    // cout<<"Info:"<<endl;
+    // cout<<width<<endl;
+    // cout<<height<<endl;
     Mat mx(height,width,CV_32F);
     Mat my(height,width,CV_32F);
     float ftu = faceTransform[faceID][0];
@@ -206,7 +212,7 @@ float *Pack::new_rotation(float u, float v, float *rotation, float inHeight,
 
     return uv;
 }
-Mat Pack::pack(Mat &in, float rotation[4]){
+void Pack::pack1(Mat &in, float rotation[4]){
     Mat packedFaces[14];
     int j = 0;
     auto start = high_resolution_clock::now();
@@ -235,10 +241,10 @@ Mat Pack::pack(Mat &in, float rotation[4]){
     auto duration = duration_cast<milliseconds>(stop - start);
     // cout << duration.count() << endl;
 
-    return packed;
+    mat = packed;
 }
 
-Mat Pack::pack2(Mat &in, float rotation[4]){
+void Pack::pack2(Mat &in, float rotation[4]){
     Mat packedFaces[14];
     int j = 0;
     auto start = high_resolution_clock::now();
@@ -275,7 +281,7 @@ Mat Pack::pack2(Mat &in, float rotation[4]){
     auto duration = duration_cast<milliseconds>(stop - start);
     // cout << duration.count() << endl;
 
-    return packed;
+    mat = packed;
 }
 // Mat Pack::pack3(Mat &in, float rotation[4]){
 //     Mat packedFaces[14];

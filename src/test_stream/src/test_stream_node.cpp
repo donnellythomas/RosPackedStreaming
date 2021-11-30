@@ -33,12 +33,12 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   cv_bridge::CvImagePtr cvImg = cv_bridge::toCvCopy(msg, "bgr8");
   cv::Mat out = cvImg->image;
   auto start = std::chrono::high_resolution_clock::now();
-  Pack packed(out, rotation);
+  Pack packed;
+  packed.pack2(out, rotation);
   // cv::Mat packed = pack2(out,rotation);
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   ROS_INFO("Pack time: %ld",duration.count());
-  // ROS_INFO("Height: %d, Width: %d", packed.rows, packed.cols);
   std::string dt = std::to_string(timestamp);
   timestamp++;
   cv::putText(packed.mat, 
@@ -47,9 +47,11 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
               cv::FONT_HERSHEY_SCRIPT_COMPLEX, 1,
               (210, 155, 155),
               4, cv::LINE_8);
-    namedWindow("face", cv::WINDOW_NORMAL);
-    resizeWindow("face", Size(768,384));
+    // namedWindow("face", cv::WINDOW_NORMAL);
+    // resizeWindow("face", Size(768,384));
     imshow("face", packed.mat);
+    ROS_INFO("Height: %d, Width: %d", packed.mat.rows, packed.mat.cols);
+
     waitKey(1);
     // exit(0);
   

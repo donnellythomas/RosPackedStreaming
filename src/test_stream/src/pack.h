@@ -2,16 +2,15 @@
 using namespace cv;
 class Pack {
     public:
-        
         void computeFaceMap(Mat &in, Mat &face, int faceID, int faceType, float rotation[4]);
-        Mat pack(Mat &in, float rotation[4]);
-        Mat pack2(Mat &in, float rotation[4]);
-        Pack(Mat m, float r[4]);
+        void pack1(Mat &in, float rotation[4]);
+        void pack2(Mat &in, float rotation[4]);
+        Pack();
         Mat mat;
     private:
         const float AN = sin(M_PI / 4);
         const float AK = cos(M_PI / 4);
-        const float CUBESIZE = 480;
+        const float CUBESIZE = 960;
         float faceTransform[6][2] = {{-M_PI / 2, 0},{0, 0},{M_PI / 2, 0},{M_PI, 0}, {0, -M_PI / 2}, {0, M_PI / 2}}; // left front right back top bottom
         float rotation[4];
         float packedCoords[14][2] = {
