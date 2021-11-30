@@ -2,71 +2,55 @@
 using namespace cv;
 class Pack {
     public:
-        void computeFaceMap(Mat &in, Mat &face, int faceID, int faceType, float rotation[4]);
-        void pack1(Mat &in, float rotation[4]);
-        void pack2(Mat &in, float rotation[4]);
+        void computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]);
+        void pack(Mat &in, float rotation[4]);
+        void precompute();
         Pack();
-        Mat mat;
+        Mat packed;
     private:
         const float AN = sin(M_PI / 4);
         const float AK = cos(M_PI / 4);
         const float CUBESIZE = 960;
         float faceTransform[6][2] = {{-M_PI / 2, 0},{0, 0},{M_PI / 2, 0},{M_PI, 0}, {0, -M_PI / 2}, {0, M_PI / 2}}; // left front right back top bottom
         float rotation[4];
-        float packedCoords[14][2] = {
-        {CUBESIZE*4,0},             //leftTop
-        {0,0},                      //left                   
-        {CUBESIZE*4,CUBESIZE/16},   //leftBottom
-        {CUBESIZE*4,CUBESIZE/16*2}, //frontTop
-        {CUBESIZE,0},               //front
-        {CUBESIZE*4,CUBESIZE/16*3}, //frontBot
-        {CUBESIZE*4,CUBESIZE/16*4}, //rightTop
-        {CUBESIZE*2,0},             //right
-        {CUBESIZE*4,CUBESIZE/16*5}, //rightBott
-        {CUBESIZE*4,CUBESIZE/16*6}, //backTop
-        {CUBESIZE*3,0},             //back
-        {CUBESIZE*4,CUBESIZE/16*7}, //backBott
-        {CUBESIZE*4+CUBESIZE/4,0},  //top
-        {CUBESIZE*4+CUBESIZE/4,CUBESIZE/4}}; //bott
+        
+        float packedCoords[14][6] = { //faceID -> faceTransform,faceType, posx, posy, height, width 
+        {0, 0, CUBESIZE*2,0,CUBESIZE*0.1f, CUBESIZE*0.4f},             //leftTop
+        {0, 1, 0,0,CUBESIZE/2, CUBESIZE},                      //left                   
+        {0, 2, CUBESIZE*2,CUBESIZE*0.1f,CUBESIZE*0.1f, CUBESIZE*0.4f},   //leftBottom
+        {1, 0, CUBESIZE*2,CUBESIZE*2*0.1f,CUBESIZE*0.1f, CUBESIZE*0.4f}, //frontTop
+        {1, 1, CUBESIZE,0,CUBESIZE/2, CUBESIZE},               //front
+        {1, 2, CUBESIZE*2,CUBESIZE*3*0.1f,CUBESIZE*0.1f, CUBESIZE*0.4f}, //frontBot
+        {2, 0, CUBESIZE*2,CUBESIZE*4*0.1f,CUBESIZE*0.1f, CUBESIZE*0.4f}, //rightTop
+        {2, 1, 0,CUBESIZE*0.5f,CUBESIZE/2, CUBESIZE},             //right
+        {2, 2, CUBESIZE*2,CUBESIZE*5*0.1f,CUBESIZE*0.1f, CUBESIZE*0.4f}, //rightBott
+        {3, 0, CUBESIZE*2,CUBESIZE*6*0.1f,CUBESIZE*0.1f, CUBESIZE*0.4f}, //backTop
+        {3, 1, CUBESIZE,CUBESIZE*0.5f,CUBESIZE/2, CUBESIZE},             //back
+        {3, 2, CUBESIZE*2,CUBESIZE*7*0.1f,CUBESIZE*0.1f, CUBESIZE*0.4f}, //backBott
+        {4, 0, CUBESIZE*2,CUBESIZE*8*0.1f,CUBESIZE*0.2f, CUBESIZE*0.2f},  //top
+        {5, 0, CUBESIZE*2+CUBESIZE*0.2f,CUBESIZE*8*0.1f,CUBESIZE*0.2f, CUBESIZE*0.2f}}; //bott
 
-        float packedCoords2[14][2] = {
-        {CUBESIZE*2,0},             //leftTop
-        {0,0},                      //left                   
-        {CUBESIZE*2,CUBESIZE*0.1f},   //leftBottom
-        {CUBESIZE*2,CUBESIZE*2*0.1f}, //frontTop
-        {CUBESIZE,0},               //front
-        {CUBESIZE*2,CUBESIZE*3*0.1f}, //frontBot
-        {CUBESIZE*2,CUBESIZE*4*0.1f}, //rightTop
-        {0,CUBESIZE*0.5f},             //right
-        {CUBESIZE*2,CUBESIZE*5*0.1f}, //rightBott
-        {CUBESIZE*2,CUBESIZE*6*0.1f}, //backTop
-        {CUBESIZE,CUBESIZE*0.5f},             //back
-        {CUBESIZE*2,CUBESIZE*7*0.1f}, //backBott
-        {CUBESIZE*2,CUBESIZE*8*0.1f},  //top
-        {CUBESIZE*2+CUBESIZE*0.2f,CUBESIZE*8*0.1f}}; //bott
-
-        float cubeCoords[14][2] = {
-        {CUBESIZE*3,CUBESIZE},          //leftTop
-        {CUBESIZE*3, CUBESIZE*1.25f},   //left
-        {CUBESIZE*3,CUBESIZE*1.75f},    //leftBottom
-        {0,CUBESIZE},                   //frontTop
-        {0,CUBESIZE*1.25f},             //front
-        {0,CUBESIZE*1.75f},             //frontBottom
-        {CUBESIZE,CUBESIZE},            //rightTop
-        {CUBESIZE, CUBESIZE*1.25f},     //right
-        {CUBESIZE,CUBESIZE*1.75f},      //rightBottom
-        {CUBESIZE*2,CUBESIZE},          //backTop
-        {CUBESIZE*2, CUBESIZE*1.25f},   //back
-        {CUBESIZE*2,CUBESIZE*1.75f},    //backBottom
-        {CUBESIZE,0},                   //top
-        {CUBESIZE,CUBESIZE*2} };  
-
+        // float cubeCoords[14][2] = {
+        // {CUBESIZE*3,CUBESIZE},          //leftTop
+        // {CUBESIZE*3, CUBESIZE*1.25f},   //left
+        // {CUBESIZE*3,CUBESIZE*1.75f},    //leftBottom
+        // {0,CUBESIZE},                   //frontTop
+        // {0,CUBESIZE*1.25f},             //front
+        // {0,CUBESIZE*1.75f},             //frontBottom
+        // {CUBESIZE,CUBESIZE},            //rightTop
+        // {CUBESIZE, CUBESIZE*1.25f},     //right
+        // {CUBESIZE,CUBESIZE*1.75f},      //rightBottom
+        // {CUBESIZE*2,CUBESIZE},          //backTop
+        // {CUBESIZE*2, CUBESIZE*1.25f},   //back
+        // {CUBESIZE*2,CUBESIZE*1.75f},    //backBottom
+        // {CUBESIZE,0},                   //top
+        // {CUBESIZE,CUBESIZE*2} };  
         float* new_rotation(float u, float v, float * rotation, float inHeight, float inWidth);
         float *quaternion_mult(const float q[4], const float r[4]) ;
         float *quaternion_inverse(const float q[4]);  
         float *CreateFromYawPitchRoll(float yaw, float pitch,
                               float roll) ;
-        float*** precompute();
-        float*** uvStore;
+        float* uv_precomp[14][480][240];
+        float* computeUV(int x, int y,int faceID );
         };
 

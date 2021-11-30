@@ -15,9 +15,10 @@ class Stream{
     Stream();
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     void rotationCallback(const sensor_msgs::Imu::ConstPtr& msg);
-    void run(int argc, char **argv);
+    void run();
     float rotation[4];
     int timestamp;
+    Pack packed;
 };
 Stream::Stream(void){
     video = cv::VideoWriter("appsrc  ! videoconvert ! x264enc bitrate=10000 speed-preset=ultrafast ! rtph264pay ! udpsink host=127.0.0.1 port=5000",cv::CAP_GSTREAMER,0, 30, cv::Size(1920,960), true); //Size(1440,160)
@@ -29,32 +30,26 @@ Stream::Stream(void){
 }
 void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
-  // ROS_INFO("callback");
-  cv_bridge::CvImagePtr cvImg = cv_bridge::toCvCopy(msg, "bgr8");
-  cv::Mat out = cvImg->image;
+  out = cv_bridge::toCvCopy(msg, "bgr8")->image;
   auto start = std::chrono::high_resolution_clock::now();
-  Pack packed;
-  packed.pack2(out, rotation);
-  // cv::Mat packed = pack2(out,rotation);
+
+  packed.pack(out, rotation);
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   ROS_INFO("Pack time: %ld",duration.count());
   std::string dt = std::to_string(timestamp);
   timestamp++;
-  cv::putText(packed.mat, 
+  cv::putText(packed.packed, 
               dt,
               cv::Size(10, 100),
               cv::FONT_HERSHEY_SCRIPT_COMPLEX, 1,
               (210, 155, 155),
               4, cv::LINE_8);
-    // namedWindow("face", cv::WINDOW_NORMAL);
-    // resizeWindow("face", Size(768,384));
-    imshow("face", packed.mat);
-    ROS_INFO("Height: %d, Width: %d", packed.mat.rows, packed.mat.cols);
 
+   namedWindow("face", cv::WINDOW_NORMAL);
+    resizeWindow("face", Size(768,384));
+    imshow("face", packed.packed);
     waitKey(1);
-    // exit(0);
-  
   // video.write(out);
 
 }
@@ -64,9 +59,8 @@ void Stream::rotationCallback(const sensor_msgs::Imu::ConstPtr& msg){
   rotation[2] = -msg->orientation.y;
   rotation[3] = msg->orientation.z; 
 }
-void Stream::run (int argc, char **argv){
+void Stream::run(){
   //initialize node 
-  ros::init(argc,argv,"test_stream_node");
   ros::NodeHandle n;
   image_transport::ImageTransport it(n);
 
@@ -86,9 +80,12 @@ void Stream::run (int argc, char **argv){
 
 int main(int argc, char **argv)
 {
+  ros::init(argc,argv,"test_stream_node");
+
   Stream stream;
 
-  stream.run(argc, argv);
+  stream.run();
+  // ROS_INFO("Hello world");
   return 0;
 }
 

@@ -1,0 +1,8 @@
+<launch>
+  <node name="test_stream_node"
+    pkg="test_stream" 
+    type="test_stream_node"
+    respawn="false" output="screen" 
+    launch-prefix="xterm -e gdb --args" >
+    </node>
+</launch>
