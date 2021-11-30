@@ -9,6 +9,9 @@ using namespace std;
 using namespace cv;
 Pack::Pack(void){          
     packed = Mat(CUBESIZE, CUBESIZE*2+CUBESIZE*0.4f, 16);
+    uvPrecomp = (float****)malloc(sizeof(float****) * 14);
+   
+    
 }
 
 float *Pack::quaternion_mult(const float q[4], const float r[4]) {
@@ -131,8 +134,8 @@ float* Pack::computeUV(int x, int y, int faceID ){
     return uv;
 }
 void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
-    float width = face.cols;
-    float height = face.rows;
+    int width = face.cols;
+    int height = face.rows;
     Mat mx(height,width,CV_32F);
     Mat my(height,width,CV_32F);
     //determine start and end points based on face type 
@@ -147,13 +150,19 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
         start = width*0.75;
         end = height + width*0.75;
     }
-    for (int y = 0; y < width; y++) {
-        for (int x = start; x < end; x++) {
+
+    for (int x = start; x < end; x++) {
+        for (int y = 0; y < width; y++) {
+
             float u,v;
             
-            float *uv = computeUV(x,y, faceID);
-            u = uv[0];
-            v = uv[1];
+            // float *uv = computeUV(x,y, faceID);
+            // u = uv[0];
+            // v = uv[1];
+            // u = uvPrecomp[faceID][0].at<float>(x,y);
+            // v = uvPrecomp[faceID][1].at<float>(x,y);
+            u = uvPrecomp[faceID][x][y][0];
+            v = uvPrecomp[faceID][x][y][1];
             float* rot_uv = new_rotation(u, v, (float *)rotation, in.rows - 1,
                               in.cols - 1);
             u = rot_uv[0];
@@ -226,6 +235,7 @@ void Pack::precompute(){
         int start = 0;
         int end = height;
         int faceType = packedCoords[i][1];
+
         if(faceType == 1){ //MID
             start = CUBESIZE/4;
             end = height + CUBESIZE/4;
@@ -234,12 +244,22 @@ void Pack::precompute(){
             start = width*0.75;
             end = height + width*0.75;
         }
-        for (int y = 0; y < width; y++) {
-            for (int x = start; x < end; x++) {
+
+        uvPrecomp[i] = (float***)malloc(sizeof(float***) * end);
+        for (int x = start; x < end; x++) {
+            uvPrecomp[i][x] = (float**)malloc(sizeof(float**) * width);
+
+            for (int y = 0; y < width; y++) {
+                uvPrecomp[i][x][y] = (float*)malloc(sizeof(float*) * 2);
+
                 float u,v;
                 
-                uv_precomp[i][x][y] = computeUV(x,y, i);
+                float*uv = computeUV(x,y, i);
 
+                 uvPrecomp[i][x][y][0] = uv[0];
+                 uvPrecomp[i][x][y][1] = uv[1];
+                // uvPrecomp[i][0].at<float>(x, y) = uv[0];
+                // uvPrecomp[i][1].at<float>(x, y) = uv[1];
             }
         }
     }

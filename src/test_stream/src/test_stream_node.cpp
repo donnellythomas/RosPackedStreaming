@@ -27,6 +27,8 @@ Stream::Stream(void){
     rotation[2] = 0;
     rotation[3] = 0;
     timestamp = 0;
+    packed.precompute();
+
 }
 void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
@@ -46,8 +48,8 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
               (210, 155, 155),
               4, cv::LINE_8);
 
-   namedWindow("face", cv::WINDOW_NORMAL);
-    resizeWindow("face", Size(768,384));
+  //  namedWindow("face", cv::WINDOW_NORMAL);
+  //   resizeWindow("face", Size(768,384));
     imshow("face", packed.packed);
     waitKey(1);
   // video.write(out);

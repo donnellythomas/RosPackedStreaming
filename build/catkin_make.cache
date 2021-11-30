@@ -1,2 +1,2 @@
 test_stream
--DCMAKE_BUILD_TYPE=Debug -DCATKIN_DEVEL_PREFIX=/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/install -G Unix Makefiles
+-DCATKIN_DEVEL_PREFIX=/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/install -G Unix Makefiles

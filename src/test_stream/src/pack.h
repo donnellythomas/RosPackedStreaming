@@ -10,10 +10,11 @@ class Pack {
     private:
         const float AN = sin(M_PI / 4);
         const float AK = cos(M_PI / 4);
-        const float CUBESIZE = 960;
+        const float CUBESIZE = 480;
         float faceTransform[6][2] = {{-M_PI / 2, 0},{0, 0},{M_PI / 2, 0},{M_PI, 0}, {0, -M_PI / 2}, {0, M_PI / 2}}; // left front right back top bottom
         float rotation[4];
-        
+        // Mat uvPrecomp[16][2];
+        float **** uvPrecomp;
         float packedCoords[14][6] = { //faceID -> faceTransform,faceType, posx, posy, height, width 
         {0, 0, CUBESIZE*2,0,CUBESIZE*0.1f, CUBESIZE*0.4f},             //leftTop
         {0, 1, 0,0,CUBESIZE/2, CUBESIZE},                      //left                   
@@ -50,7 +51,6 @@ class Pack {
         float *quaternion_inverse(const float q[4]);  
         float *CreateFromYawPitchRoll(float yaw, float pitch,
                               float roll) ;
-        float* uv_precomp[14][480][240];
         float* computeUV(int x, int y,int faceID );
         };
 
