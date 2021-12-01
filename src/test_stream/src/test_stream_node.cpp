@@ -17,16 +17,16 @@ class Stream{
     void rotationCallback(const sensor_msgs::Imu::ConstPtr& msg);
     void run();
     float rotation[4];
-    int timestamp;
+    int frame_num;
     Pack packed;
 };
 Stream::Stream(void){
-    video = cv::VideoWriter("appsrc  ! videoconvert ! x264enc bitrate=10000 speed-preset=ultrafast ! rtph264pay ! udpsink host=127.0.0.1 port=5000",cv::CAP_GSTREAMER,0, 30, cv::Size(1920,960), true); //Size(1440,160)
+    video = cv::VideoWriter("appsrc  ! videoconvert ! video/x-raw !  x264enc  ! rtph264pay ! udpsink host=127.0.0.1 port=5000",cv::CAP_GSTREAMER,0, 10, cv::Size(2304,960), true); //Size(1440,160)
     rotation[0] = 1;
     rotation[1] = 0;
     rotation[2] = 0;
     rotation[3] = 0;
-    timestamp = 0;
+    frame_num = 0;
     packed.precompute();
 
 }
@@ -35,24 +35,25 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   out = cv_bridge::toCvCopy(msg, "bgr8")->image;
   auto start = std::chrono::high_resolution_clock::now();
 
-  packed.pack(out, rotation);
+  packed.pack(out, rotation, frame_num);
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  ROS_INFO("%d, %d", packed.packed.rows, packed.packed.cols);
   ROS_INFO("Pack time: %ld",duration.count());
-  std::string dt = std::to_string(timestamp);
-  timestamp++;
-  cv::putText(packed.packed, 
-              dt,
-              cv::Size(10, 100),
-              cv::FONT_HERSHEY_SCRIPT_COMPLEX, 1,
-              (210, 155, 155),
-              4, cv::LINE_8);
+  std::string dt = std::to_string(frame_num);
+  frame_num++;
+  // cv::putText(packed.packed, 
+  //             dt,
+  //             cv::Size(10, 100),
+  //             cv::FONT_HERSHEY_SCRIPT_COMPLEX, 1,
+  //             (210, 155, 155),
+  //             4, cv::LINE_8);
 
   //  namedWindow("face", cv::WINDOW_NORMAL);
   //   resizeWindow("face", Size(768,384));
-    imshow("face", packed.packed);
-    waitKey(1);
-  // video.write(out);
+  //   imshow("face", packed.packed);
+  //   waitKey(1);
+  video.write(packed.packed);
 
 }
 void Stream::rotationCallback(const sensor_msgs::Imu::ConstPtr& msg){

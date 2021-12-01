@@ -9,9 +9,6 @@ using namespace std;
 using namespace cv;
 Pack::Pack(void){          
     packed = Mat(CUBESIZE, CUBESIZE*2+CUBESIZE*0.4f, 16);
-    uvPrecomp = (float****)malloc(sizeof(float****) * 14);
-   
-    
 }
 
 float *Pack::quaternion_mult(const float q[4], const float r[4]) {
@@ -46,35 +43,7 @@ float *Pack::quaternion_inverse(const float q[4]){
     ret[3] = -q3;
     return ret;
 }
-float* Pack::CreateFromYawPitchRoll(float yaw, float pitch,
-                              float roll)  // yaw (Z), pitch (Y), roll (X)
-{
-    // Abbreviations for the various angular functions
-    float cy = cos(yaw * 0.5);
-    float sy = sin(yaw * 0.5);
-    float cp = cos(pitch * 0.5);
-    float sp = sin(pitch * 0.5);
-    float cr = cos(roll * 0.5);
-    float sr = sin(roll * 0.5);
 
-    float m_w = cy * cp * cr + sy * sp * sr;
-    // printf("%f\n", m_w);
-    float m_x = cy * cp * sr - sy * sp * cr;
-    // printf("%f\n", m_x);
-
-    float m_y = sy * cp * sr + cy * sp * cr;
-    // printf("%f\n", m_y);
-
-    float m_z = sy * cp * cr - cy * sp * sr;
-    // printf("%f\n", m_z);
-
-    static float rotation[4];
-    rotation[0] = m_w;
-    rotation[1] = m_x;
-    rotation[2] = m_y;
-    rotation[3] = m_z;
-    return rotation;
-}
 float* Pack::computeUV(int x, int y, int faceID ){
     // Map face pixel coordinates to [-1, 1] on plane
     int faceTrans = packedCoords[faceID][0];
@@ -128,10 +97,18 @@ float* Pack::computeUV(int x, int y, int faceID ){
 
     u = u / 2.0f + 0.5f;
     v = v / 2.0f + 0.5f;
-    static float uv[2];
-    uv[0] = u;
-    uv[1] = v;
-    return uv;
+    static float precomp[7];
+    float latitude = v * M_PI - M_PI / 2.0;
+    float longitude = u * 2.0 * M_PI - M_PI;
+    precomp[0] = u;
+    precomp[1] = v;
+    precomp[2] = latitude;
+    precomp[3] = longitude;
+    // Create a ray from the latitude and longitude
+    precomp[4] = cos(latitude) * sin(longitude);
+    precomp[5] = sin(latitude);
+    precomp[6] = cos(latitude) * cos(longitude);
+    return precomp;
 }
 void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
     int width = face.cols;
@@ -155,15 +132,14 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
         for (int y = 0; y < width; y++) {
 
             float u,v;
-            
-            // float *uv = computeUV(x,y, faceID);
-            // u = uv[0];
-            // v = uv[1];
-            // u = uvPrecomp[faceID][0].at<float>(x,y);
-            // v = uvPrecomp[faceID][1].at<float>(x,y);
             u = uvPrecomp[faceID][x][y][0];
             v = uvPrecomp[faceID][x][y][1];
-            float* rot_uv = new_rotation(u, v, (float *)rotation, in.rows - 1,
+            float latitude = uvPrecomp[faceID][x][y][2];
+            float longitude = uvPrecomp[faceID][x][y][3];
+            float x_rot = uvPrecomp[faceID][x][y][4];
+            float y_rot = uvPrecomp[faceID][x][y][5];
+            float z_rot = uvPrecomp[faceID][x][y][6];
+            float* rot_uv = new_rotation(latitude,longitude,x_rot,y_rot,z_rot, (float *)rotation, in.rows - 1,
                               in.cols - 1);
             u = rot_uv[0];
             v = rot_uv[1];
@@ -177,18 +153,18 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
           Scalar(0, 0, 0));
 
 } 
-float *Pack::new_rotation(float u, float v, float *rotation, float inHeight,
+float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, float *rotation, float inHeight,
                     float inWidth) {
     // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
-    float latitude = v * M_PI - M_PI / 2.0;
-    float longitude = u * 2.0 * M_PI - M_PI;
-    // Create a ray from the latitude and longitude
+    // float latitude = v * M_PI - M_PI / 2.0;
+    // float longitude = u * 2.0 * M_PI - M_PI;
+    // // Create a ray from the latitude and longitude
     float p[4];
     p[0] = 0; 
-    p[1] = cos(latitude) * sin(longitude);
-    p[2] = sin(latitude);
-    p[3] = cos(latitude) * cos(longitude);
+    p[1] = x;
+    p[2] = y;
+    p[3] = z;
 
     // Rotate the ray based on the user input
     float rotationInv[4] = {rotation[0], -rotation[1], -rotation[2],
@@ -196,39 +172,52 @@ float *Pack::new_rotation(float u, float v, float *rotation, float inHeight,
     float *p_ret = quaternion_mult(
         quaternion_mult((float *)rotation, (float *)p), (float *)rotationInv);
 
-    float x = p_ret[1];
-    float y = p_ret[2];
-    float z = p_ret[3];
+    float x_rot = p_ret[1];
+    float y_rot = p_ret[2];
+    float z_rot = p_ret[3];
     // Convert back to latitude and longitude
     latitude = asin(y);
-    longitude = atan2(x, z);
+    longitude = atan2(x_rot, z_rot);
+
     // Convert back to the normalized M_PIxel coordinate
-    x = (longitude + M_PI) / (2.0 * M_PI);
-    y = (latitude + M_PI / 2.0) / M_PI;
+     x_rot = (longitude + M_PI) / (2.0 * M_PI);
+     y_rot = (latitude + M_PI / 2.0) / M_PI;
     static float uv[2];
     // Convert to xy source M_PIxel coordinate
-    uv[1] = y * inHeight;
-    uv[0] = x * inWidth;
+    uv[1] = y_rot * inHeight;
+    uv[0] = x_rot * inWidth;
 
     return uv;
 }
 
-
-void Pack::pack(Mat &in, float rotation[4]){
+void Pack::packFace(Mat &in, float rotation[4], int faceID){
+    int height = packedCoords[faceID][4];
+    int width = packedCoords[faceID][5];
+    Mat packedFace =  Mat(height, width, in.type());
+    computeFaceMap(in, packedFace, faceID, rotation);
+    packedFace.copyTo(packed(Rect(packedCoords[faceID][2],  packedCoords[faceID][3],packedFace.cols, packedFace.rows)));
+}
+void Pack::pack(Mat &in, float rotation[4], int frame_num){
     int height, width;
     //compute all faces
-    for(int i = 0; i < 14; i++){
-        height = packedCoords[i][4];
-        width = packedCoords[i][5];
-        Mat packedFace =  Mat(height, width, in.type());
-        computeFaceMap(in, packedFace, i, rotation);
-        packedFace.copyTo(packed(Rect(packedCoords[i][2],  packedCoords[i][3],packedFace.cols, packedFace.rows)));
+    int horizon[4] = {1,4,7,10};
+    int horizonTopBott[8]={0,2,3,5,6,8,9,11};
+    int topBott[2] = {12,13};
+    if(frame_num%20 == 0){
+        packFace(in, rotation, topBott[0]);
+        packFace(in, rotation, topBott[1]);    // float rotation[4];
+
     }
+    if(frame_num%4 == 0){
+        for(int i = 0; i < 8; i++)
+            packFace(in, rotation, horizonTopBott[i]); 
+    }
+    for(int i = 0; i < 4; i++)
+        packFace(in, rotation, horizon[i]); 
 }
 
-
-
 void Pack::precompute(){
+    uvPrecomp = (float****)malloc(sizeof(float****) * 14);
     for(int i = 0; i < 14; i++){
         int height = packedCoords[i][4];
         int width = packedCoords[i][5];
@@ -244,22 +233,20 @@ void Pack::precompute(){
             start = width*0.75;
             end = height + width*0.75;
         }
-
         uvPrecomp[i] = (float***)malloc(sizeof(float***) * end);
         for (int x = start; x < end; x++) {
             uvPrecomp[i][x] = (float**)malloc(sizeof(float**) * width);
-
             for (int y = 0; y < width; y++) {
-                uvPrecomp[i][x][y] = (float*)malloc(sizeof(float*) * 2);
-
+                uvPrecomp[i][x][y] = (float*)malloc(sizeof(float*) * 7);
                 float u,v;
-                
                 float*uv = computeUV(x,y, i);
-
-                 uvPrecomp[i][x][y][0] = uv[0];
-                 uvPrecomp[i][x][y][1] = uv[1];
-                // uvPrecomp[i][0].at<float>(x, y) = uv[0];
-                // uvPrecomp[i][1].at<float>(x, y) = uv[1];
+                uvPrecomp[i][x][y][0] = uv[0];
+                uvPrecomp[i][x][y][1] = uv[1];
+                uvPrecomp[i][x][y][2] = uv[2];
+                uvPrecomp[i][x][y][3] = uv[3];
+                uvPrecomp[i][x][y][4] = uv[4];
+                uvPrecomp[i][x][y][5] = uv[5];
+                uvPrecomp[i][x][y][6] = uv[6];
             }
         }
     }
