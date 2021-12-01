@@ -21,7 +21,9 @@ class Stream{
     Pack packed;
 };
 Stream::Stream(void){
-    video = cv::VideoWriter("appsrc  ! videoconvert ! video/x-raw !  x264enc  ! rtph264pay ! udpsink host=127.0.0.1 port=5000",cv::CAP_GSTREAMER,0, 10, cv::Size(2304,960), true); //Size(1440,160)
+    // video = cv::VideoWriter("appsrc  ! videoconvert ! video/x-raw !  x264enc  ! rtph264pay ! udpsink host=127.0.0.1 port=5000",cv::CAP_GSTREAMER,0, 10, cv::Size(2304,960), true); //Size(1440,160)
+     video = cv::VideoWriter("out.mp4",VideoWriter::fourcc('H','V','C','1'),30, Size(2880,1920));
+
     rotation[0] = 1;
     rotation[1] = 0;
     rotation[2] = 0;
@@ -42,6 +44,7 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   ROS_INFO("Pack time: %ld",duration.count());
   std::string dt = std::to_string(frame_num);
   frame_num++;
+  packed.unpack();
   // cv::putText(packed.packed, 
   //             dt,
   //             cv::Size(10, 100),
@@ -49,10 +52,10 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   //             (210, 155, 155),
   //             4, cv::LINE_8);
 
-  //  namedWindow("face", cv::WINDOW_NORMAL);
-  //   resizeWindow("face", Size(768,384));
-  //   imshow("face", packed.packed);
-  //   waitKey(1);
+   namedWindow("face", cv::WINDOW_NORMAL);
+    resizeWindow("face", Size(768,384));
+    imshow("face", packed.unpacked);
+    waitKey(1);
   video.write(packed.packed);
 
 }

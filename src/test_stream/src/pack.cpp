@@ -9,6 +9,8 @@ using namespace std;
 using namespace cv;
 Pack::Pack(void){          
     packed = Mat(CUBESIZE, CUBESIZE*2+CUBESIZE*0.4f, 16);
+    unpacked = Mat(CUBESIZE * 3, CUBESIZE * 4, 16);
+
 }
 
 float *Pack::quaternion_mult(const float q[4], const float r[4]) {
@@ -203,17 +205,20 @@ void Pack::pack(Mat &in, float rotation[4], int frame_num){
     int horizon[4] = {1,4,7,10};
     int horizonTopBott[8]={0,2,3,5,6,8,9,11};
     int topBott[2] = {12,13};
-    if(frame_num%20 == 0){
+    if(frame_num%2==0){
+
+    
+    // if(frame_num%20 == 0){
         packFace(in, rotation, topBott[0]);
         packFace(in, rotation, topBott[1]);    // float rotation[4];
-
-    }
-    if(frame_num%4 == 0){
+    // }
+    // if(frame_num%4 == 0){
         for(int i = 0; i < 8; i++)
             packFace(in, rotation, horizonTopBott[i]); 
-    }
+    // }
     for(int i = 0; i < 4; i++)
         packFace(in, rotation, horizon[i]); 
+        }
 }
 
 void Pack::precompute(){
@@ -251,3 +256,36 @@ void Pack::precompute(){
         }
     }
 }
+
+
+void Pack::unpack(){
+    Mat face;
+    for(int i = 0; i < 12; i++){
+        face = packed(Range(packedCoords[i][3],packedCoords[i][3]+packedCoords[i][4]),Range(packedCoords[i][2],packedCoords[i][2]+packedCoords[i][5]));
+        resize(face, face, Size(),2.5, 2.5, INTER_CUBIC); //upscale 4
+        face.copyTo(unpacked(Rect(cubeCoords[i][0],  cubeCoords[i][1],face.cols, face.rows)));
+        i++;
+
+        face = packed(Range(packedCoords[i][3],packedCoords[i][3]+packedCoords[i][4]),Range(packedCoords[i][2],packedCoords[i][2]+packedCoords[i][5]));
+        face.copyTo(unpacked(Rect(cubeCoords[i][0],  cubeCoords[i][1], face.cols, face.rows)));
+        i++;
+
+        face = packed(Range(packedCoords[i][3],packedCoords[i][3]+packedCoords[i][4]),Range(packedCoords[i][2],packedCoords[i][2]+packedCoords[i][5]));
+        resize(face, face, Size(),2.5, 2.5, INTER_CUBIC); //upscale 4
+        face.copyTo(unpacked(Rect(cubeCoords[i][0],  cubeCoords[i][1],face.cols, face.rows)));
+    }
+
+   
+    int i = 12;
+    Mat top = packed(Range(packedCoords[i][3],packedCoords[i][3]+packedCoords[i][4]),Range(packedCoords[i][2],packedCoords[i][2]+packedCoords[i][5]));
+    resize(top, top, Size(),5, 5, INTER_CUBIC); //upscale 4
+    rotate(top, top, ROTATE_90_CLOCKWISE);
+    top.copyTo(unpacked(Rect(cubeCoords[i][0],  cubeCoords[i][1],top.cols, top.rows)));
+    
+    i = 13;
+    Mat bottom = packed(Range(packedCoords[i][3],packedCoords[i][3]+packedCoords[i][4]),Range(packedCoords[i][2],packedCoords[i][2]+packedCoords[i][5]));
+    resize(bottom, bottom, Size(),5, 5, INTER_CUBIC); //upscale 4
+    rotate(bottom, bottom, ROTATE_90_COUNTERCLOCKWISE);
+    bottom.copyTo(unpacked(Rect(cubeCoords[i][0],  cubeCoords[i][1],bottom.cols, bottom.rows)));
+}
+

@@ -7,6 +7,9 @@ class Pack {
         void precompute();
         Pack();
         Mat packed;
+        Mat unpacked;
+        void unpack();
+
     private:
         const float AN = sin(M_PI / 4);
         const float AK = cos(M_PI / 4);
@@ -31,21 +34,22 @@ class Pack {
         {4, 0, CUBESIZE*2,CUBESIZE*8*0.1f,CUBESIZE*0.2f, CUBESIZE*0.2f},  //top
         {5, 0, CUBESIZE*2+CUBESIZE*0.2f,CUBESIZE*8*0.1f,CUBESIZE*0.2f, CUBESIZE*0.2f}}; //bott
 
-        // float cubeCoords[14][2] = {
-        // {CUBESIZE*3,CUBESIZE},          //leftTop
-        // {CUBESIZE*3, CUBESIZE*1.25f},   //left
-        // {CUBESIZE*3,CUBESIZE*1.75f},    //leftBottom
-        // {0,CUBESIZE},                   //frontTop
-        // {0,CUBESIZE*1.25f},             //front
-        // {0,CUBESIZE*1.75f},             //frontBottom
-        // {CUBESIZE,CUBESIZE},            //rightTop
-        // {CUBESIZE, CUBESIZE*1.25f},     //right
-        // {CUBESIZE,CUBESIZE*1.75f},      //rightBottom
-        // {CUBESIZE*2,CUBESIZE},          //backTop
-        // {CUBESIZE*2, CUBESIZE*1.25f},   //back
-        // {CUBESIZE*2,CUBESIZE*1.75f},    //backBottom
-        // {CUBESIZE,0},                   //top
-        // {CUBESIZE,CUBESIZE*2} };  
+        float cubeCoords[14][2] = {
+        {0,CUBESIZE},                   //lefttop
+        {0,CUBESIZE*1.25f},             //left
+        {0,CUBESIZE*1.75f},             //leftbottom
+        {CUBESIZE,CUBESIZE},            //fronttop
+        {CUBESIZE, CUBESIZE*1.25f},     //frontRight
+        {CUBESIZE,CUBESIZE*1.75f},      //frontBottom
+        {CUBESIZE*2,CUBESIZE},          //backTop
+        {CUBESIZE*2, CUBESIZE*1.25f},   //back
+        {CUBESIZE*2,CUBESIZE*1.75f},    //backBottom
+        {CUBESIZE*3,CUBESIZE},          //righttop
+        {CUBESIZE*3, CUBESIZE*1.25f},   //right
+        {CUBESIZE*3,CUBESIZE*1.75f},    //rightbottom                
+        {CUBESIZE,0}, //top
+        {CUBESIZE,CUBESIZE*2} //bottom
+        };  
         float *new_rotation(float longitude, float latitude, float x, float y, float z, float *rotation, float inHeight,
                     float inWidth);
                             float *quaternion_mult(const float q[4], const float r[4]) ;
