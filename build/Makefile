@@ -402,19 +402,6 @@ std_msgs_generate_messages_eus/fast:
 .PHONY : std_msgs_generate_messages_eus/fast
 
 #=============================================================================
-# Target rules for targets named geometry_msgs_generate_messages_lisp
-
-# Build rule for target.
-geometry_msgs_generate_messages_lisp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 geometry_msgs_generate_messages_lisp
-.PHONY : geometry_msgs_generate_messages_lisp
-
-# fast build rule for target.
-geometry_msgs_generate_messages_lisp/fast:
-	$(MAKE) -f test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build.make test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build
-.PHONY : geometry_msgs_generate_messages_lisp/fast
-
-#=============================================================================
 # Target rules for targets named roscpp_generate_messages_py
 
 # Build rule for target.
@@ -610,6 +597,32 @@ test_stream_node/fast:
 .PHONY : test_stream_node/fast
 
 #=============================================================================
+# Target rules for targets named geometry_msgs_generate_messages_lisp
+
+# Build rule for target.
+geometry_msgs_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 geometry_msgs_generate_messages_lisp
+.PHONY : geometry_msgs_generate_messages_lisp
+
+# fast build rule for target.
+geometry_msgs_generate_messages_lisp/fast:
+	$(MAKE) -f test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build.make test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build
+.PHONY : geometry_msgs_generate_messages_lisp/fast
+
+#=============================================================================
+# Target rules for targets named rotation_node
+
+# Build rule for target.
+rotation_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rotation_node
+.PHONY : rotation_node
+
+# fast build rule for target.
+rotation_node/fast:
+	$(MAKE) -f test_stream/CMakeFiles/rotation_node.dir/build.make test_stream/CMakeFiles/rotation_node.dir/build
+.PHONY : rotation_node/fast
+
+#=============================================================================
 # Target rules for targets named video_publisher_node
 
 # Build rule for target.
@@ -666,7 +679,6 @@ help:
 	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_nodejs"
 	@echo "... std_msgs_generate_messages_eus"
-	@echo "... geometry_msgs_generate_messages_lisp"
 	@echo "... roscpp_generate_messages_py"
 	@echo "... std_msgs_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_nodejs"
@@ -682,6 +694,8 @@ help:
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... geometry_msgs_generate_messages_eus"
 	@echo "... test_stream_node"
+	@echo "... geometry_msgs_generate_messages_lisp"
+	@echo "... rotation_node"
 	@echo "... video_publisher_node"
 	@echo "... rosgraph_msgs_generate_messages_cpp"
 .PHONY : help

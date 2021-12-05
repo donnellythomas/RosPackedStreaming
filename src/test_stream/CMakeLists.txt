@@ -138,6 +138,11 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
+add_executable(rotation_node src/rotation_node.cpp src/pack.cpp src/pack.h )
+target_link_libraries(rotation_node
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
 add_executable(video_publisher_node src/video_publisher_node.cpp)
 target_link_libraries(video_publisher_node
   ${catkin_LIBRARIES}

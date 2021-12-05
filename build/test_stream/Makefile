@@ -90,6 +90,17 @@ list_install_components/fast: list_install_components
 
 .PHONY : list_install_components/fast
 
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
+
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
@@ -123,17 +134,6 @@ test:
 test/fast: test
 
 .PHONY : test/fast
-
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -301,21 +301,6 @@ std_msgs_generate_messages_eus: test_stream/CMakeFiles/std_msgs_generate_message
 std_msgs_generate_messages_eus/fast:
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make test_stream/CMakeFiles/std_msgs_generate_messages_eus.dir/build
 .PHONY : std_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule:
-	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
-.PHONY : test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-geometry_msgs_generate_messages_lisp: test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : geometry_msgs_generate_messages_lisp
-
-# fast build rule for target.
-geometry_msgs_generate_messages_lisp/fast:
-	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build.make test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build
-.PHONY : geometry_msgs_generate_messages_lisp/fast
 
 # Convenience name for target.
 test_stream/CMakeFiles/roscpp_generate_messages_py.dir/rule:
@@ -543,6 +528,36 @@ test_stream_node/fast:
 .PHONY : test_stream_node/fast
 
 # Convenience name for target.
+test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
+.PHONY : test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+geometry_msgs_generate_messages_lisp: test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
+
+.PHONY : geometry_msgs_generate_messages_lisp
+
+# fast build rule for target.
+geometry_msgs_generate_messages_lisp/fast:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build.make test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build
+.PHONY : geometry_msgs_generate_messages_lisp/fast
+
+# Convenience name for target.
+test_stream/CMakeFiles/rotation_node.dir/rule:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 test_stream/CMakeFiles/rotation_node.dir/rule
+.PHONY : test_stream/CMakeFiles/rotation_node.dir/rule
+
+# Convenience name for target.
+rotation_node: test_stream/CMakeFiles/rotation_node.dir/rule
+
+.PHONY : rotation_node
+
+# fast build rule for target.
+rotation_node/fast:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/rotation_node.dir/build.make test_stream/CMakeFiles/rotation_node.dir/build
+.PHONY : rotation_node/fast
+
+# Convenience name for target.
 test_stream/CMakeFiles/video_publisher_node.dir/rule:
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 test_stream/CMakeFiles/video_publisher_node.dir/rule
 .PHONY : test_stream/CMakeFiles/video_publisher_node.dir/rule
@@ -579,6 +594,7 @@ src/pack.o: src/pack.cpp.o
 # target to build an object file
 src/pack.cpp.o:
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/rotation_node.dir/build.make test_stream/CMakeFiles/rotation_node.dir/src/pack.cpp.o
 .PHONY : src/pack.cpp.o
 
 src/pack.i: src/pack.cpp.i
@@ -588,6 +604,7 @@ src/pack.i: src/pack.cpp.i
 # target to preprocess a source file
 src/pack.cpp.i:
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.i
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/rotation_node.dir/build.make test_stream/CMakeFiles/rotation_node.dir/src/pack.cpp.i
 .PHONY : src/pack.cpp.i
 
 src/pack.s: src/pack.cpp.s
@@ -597,7 +614,35 @@ src/pack.s: src/pack.cpp.s
 # target to generate assembly for a file
 src/pack.cpp.s:
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.s
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/rotation_node.dir/build.make test_stream/CMakeFiles/rotation_node.dir/src/pack.cpp.s
 .PHONY : src/pack.cpp.s
+
+src/rotation_node.o: src/rotation_node.cpp.o
+
+.PHONY : src/rotation_node.o
+
+# target to build an object file
+src/rotation_node.cpp.o:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/rotation_node.dir/build.make test_stream/CMakeFiles/rotation_node.dir/src/rotation_node.cpp.o
+.PHONY : src/rotation_node.cpp.o
+
+src/rotation_node.i: src/rotation_node.cpp.i
+
+.PHONY : src/rotation_node.i
+
+# target to preprocess a source file
+src/rotation_node.cpp.i:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/rotation_node.dir/build.make test_stream/CMakeFiles/rotation_node.dir/src/rotation_node.cpp.i
+.PHONY : src/rotation_node.cpp.i
+
+src/rotation_node.s: src/rotation_node.cpp.s
+
+.PHONY : src/rotation_node.s
+
+# target to generate assembly for a file
+src/rotation_node.cpp.s:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/rotation_node.dir/build.make test_stream/CMakeFiles/rotation_node.dir/src/rotation_node.cpp.s
+.PHONY : src/rotation_node.cpp.s
 
 src/test_stream_node.o: src/test_stream_node.cpp.o
 
@@ -662,6 +707,7 @@ help:
 	@echo "... install/strip"
 	@echo "... install"
 	@echo "... list_install_components"
+	@echo "... edit_cache"
 	@echo "... rosgraph_msgs_generate_messages_py"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... geometry_msgs_generate_messages_cpp"
@@ -672,7 +718,6 @@ help:
 	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_nodejs"
 	@echo "... std_msgs_generate_messages_eus"
-	@echo "... geometry_msgs_generate_messages_lisp"
 	@echo "... roscpp_generate_messages_py"
 	@echo "... std_msgs_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_nodejs"
@@ -689,13 +734,17 @@ help:
 	@echo "... std_msgs_generate_messages_nodejs"
 	@echo "... geometry_msgs_generate_messages_eus"
 	@echo "... test_stream_node"
+	@echo "... geometry_msgs_generate_messages_lisp"
+	@echo "... rotation_node"
 	@echo "... video_publisher_node"
 	@echo "... rosgraph_msgs_generate_messages_cpp"
 	@echo "... test"
-	@echo "... edit_cache"
 	@echo "... src/pack.o"
 	@echo "... src/pack.i"
 	@echo "... src/pack.s"
+	@echo "... src/rotation_node.o"
+	@echo "... src/rotation_node.i"
+	@echo "... src/rotation_node.s"
 	@echo "... src/test_stream_node.o"
 	@echo "... src/test_stream_node.i"
 	@echo "... src/test_stream_node.s"

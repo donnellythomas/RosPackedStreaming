@@ -112,7 +112,7 @@ float* Pack::computeUV(int x, int y, int faceID ){
     precomp[6] = cos(latitude) * cos(longitude);
     return precomp;
 }
-void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
+void Pack::computeFaceMap(Mat &in, Mat &face, int faceID){
     int width = face.cols;
     int height = face.rows;
     Mat mx(height,width,CV_32F);
@@ -141,7 +141,7 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
             float x_rot = uvPrecomp[faceID][x][y][4];
             float y_rot = uvPrecomp[faceID][x][y][5];
             float z_rot = uvPrecomp[faceID][x][y][6];
-            float* rot_uv = new_rotation(latitude,longitude,x_rot,y_rot,z_rot, (float *)rotation, in.rows - 1,
+            float* rot_uv = new_rotation(latitude,longitude,x_rot,y_rot,z_rot, in.rows - 1,
                               in.cols - 1);
             u = rot_uv[0];
             v = rot_uv[1];
@@ -155,12 +155,12 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
           Scalar(0, 0, 0));
 
 } 
-float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, float *rotation, float inHeight,
+float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, float inHeight,
                     float inWidth) {
     // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
-    // float latitude = v * M_PI - M_PI / 2.0;
-    // float longitude = u * 2.0 * M_PI - M_PI;
+    float latitude = v * M_PI - M_PI / 2.0;
+    float longitude = u * 2.0 * M_PI - M_PI;
     // // Create a ray from the latitude and longitude
     float p[4];
     p[0] = 0; 
@@ -169,14 +169,14 @@ float *Pack::new_rotation(float latitude, float longitude, float x, float y, flo
     p[3] = z;
 
     // Rotate the ray based on the user input
-    float rotationInv[4] = {rotation[0], -rotation[1], -rotation[2],
-                            -rotation[3]};
-    float *p_ret = quaternion_mult(
-        quaternion_mult((float *)rotation, (float *)p), (float *)rotationInv);
-
-    float x_rot = p_ret[1];
-    float y_rot = p_ret[2];
-    float z_rot = p_ret[3];
+    // float rotatioInv[4] = {rotation[0], -rotation[1], -rotation[2],
+    //                         -rotation[3]};
+    // float *p_ret = quaternion_mult(
+    //     quaternion_mult((float *)rotation, (float *)p), rotation);
+    // printf("%f, %f, %f, %f", rotation[0], rotation[1], rotation[2], rotation[3]);
+    float x_rot = rotation[1];
+    float y_rot = rotation[2];
+    float z_rot = rotation[3];
     // Convert back to latitude and longitude
     latitude = asin(y);
     longitude = atan2(x_rot, z_rot);
@@ -192,15 +192,16 @@ float *Pack::new_rotation(float latitude, float longitude, float x, float y, flo
     return uv;
 }
 
-void Pack::packFace(Mat &in, float rotation[4], int faceID){
+void Pack::packFace(Mat &in, int faceID){
     int height = packedCoords[faceID][4];
     int width = packedCoords[faceID][5];
     Mat packedFace =  Mat(height, width, in.type());
-    computeFaceMap(in, packedFace, faceID, rotation);
+    computeFaceMap(in, packedFace, faceID);
     packedFace.copyTo(packed(Rect(packedCoords[faceID][2],  packedCoords[faceID][3],packedFace.cols, packedFace.rows)));
 }
-void Pack::pack(Mat &in, float rotation[4], int frame_num){
-    int height, width;
+void Pack::pack(Mat &in, int frame_num){
+    int height, width;VideoWriter::fourcc('a', 'v', 'c', '1');
+
     //compute all faces
     int horizon[4] = {1,4,7,10};
     int horizonTopBott[8]={0,2,3,5,6,8,9,11};
@@ -209,15 +210,15 @@ void Pack::pack(Mat &in, float rotation[4], int frame_num){
 
     
     // if(frame_num%20 == 0){
-        packFace(in, rotation, topBott[0]);
-        packFace(in, rotation, topBott[1]);    // float rotation[4];
+        packFace(in, topBott[0]);
+        packFace(in, topBott[1]);    // float rotation[4];
     // }
     // if(frame_num%4 == 0){
         for(int i = 0; i < 8; i++)
-            packFace(in, rotation, horizonTopBott[i]); 
+            packFace(in, horizonTopBott[i]); 
     // }
     for(int i = 0; i < 4; i++)
-        packFace(in, rotation, horizon[i]); 
+        packFace(in, horizon[i]); 
         }
 }
 

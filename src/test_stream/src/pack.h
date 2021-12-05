@@ -2,8 +2,8 @@
 using namespace cv;
 class Pack {
     public:
-        void computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]);
-        void pack(Mat &in, float rotation[4], int frame_num);
+        void computeFaceMap(Mat &in, Mat &face, int faceID);
+        void pack(Mat &in, int frame_num);
         void precompute();
         Pack();
         Mat packed;
@@ -50,14 +50,14 @@ class Pack {
         {CUBESIZE,0}, //top
         {CUBESIZE,CUBESIZE*2} //bottom
         };  
-        float *new_rotation(float longitude, float latitude, float x, float y, float z, float *rotation, float inHeight,
+        float *new_rotation(float longitude, float latitude, float x, float y, float z, float inHeight,
                     float inWidth);
                             float *quaternion_mult(const float q[4], const float r[4]) ;
         float *quaternion_inverse(const float q[4]);  
         float *CreateFromYawPitchRoll(float yaw, float pitch,
                               float roll) ;
         float* computeUV(int x, int y,int faceID );
-        void packFace(Mat &in, float rotation[4], int faceID);
+        void packFace(Mat &in, int faceID);
 
         };
 

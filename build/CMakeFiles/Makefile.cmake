@@ -227,7 +227,6 @@ set(CMAKE_DEPEND_INFO_FILES
   "test_stream/CMakeFiles/std_msgs_generate_messages_cpp.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/roscpp_generate_messages_nodejs.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/std_msgs_generate_messages_eus.dir/DependInfo.cmake"
-  "test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/roscpp_generate_messages_py.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/std_msgs_generate_messages_lisp.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/DependInfo.cmake"
@@ -243,6 +242,8 @@ set(CMAKE_DEPEND_INFO_FILES
   "test_stream/CMakeFiles/std_msgs_generate_messages_nodejs.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/geometry_msgs_generate_messages_eus.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/test_stream_node.dir/DependInfo.cmake"
+  "test_stream/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/DependInfo.cmake"
+  "test_stream/CMakeFiles/rotation_node.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/video_publisher_node.dir/DependInfo.cmake"
   "test_stream/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/DependInfo.cmake"
   )
