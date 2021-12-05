@@ -19,10 +19,11 @@ class Stream{
     float rotation[4];
     int frame_num;
     Pack packed;
+    Pack no_rotation;
 };
 Stream::Stream(void){
     // video = cv::VideoWriter("appsrc  ! videoconvert ! video/x-raw !  x264enc  ! rtph264pay ! udpsink host=127.0.0.1 port=5000",cv::CAP_GSTREAMER,0, 10, cv::Size(2304,960), true); //Size(1440,160)
-     video = cv::VideoWriter("out.mp4",VideoWriter::fourcc('H','V','C','1'),30, Size(2880,1920));
+    video = cv::VideoWriter("out.mp4",VideoWriter::fourcc('H','V','C','1'),30, Size(2880,1920));
 
     rotation[0] = 1;
     rotation[1] = 0;
@@ -30,21 +31,32 @@ Stream::Stream(void){
     rotation[3] = 0;
     frame_num = 0;
     packed.precompute();
+    no_rotation.precompute();
+    namedWindow("face", cv::WINDOW_NORMAL);
+    resizeWindow("face", Size(768,384));
+    namedWindow("face2", cv::WINDOW_NORMAL);
+    resizeWindow("face2", Size(768,384));
 
 }
 void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
   out = cv_bridge::toCvCopy(msg, "bgr8")->image;
   auto start = std::chrono::high_resolution_clock::now();
-
-  packed.pack(out, rotation, frame_num);
+  // packed.with_rotation = 1;
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-  ROS_INFO("%d, %d", packed.packed.rows, packed.packed.cols);
+  // ROS_INFO("%d, %d", packed.packed.rows, packed.packed.cols);
   ROS_INFO("Pack time: %ld",duration.count());
-  std::string dt = std::to_string(frame_num);
   frame_num++;
+  
+  packed.pack(out, rotation, frame_num);
+  ROS_INFO("%f, %f, %f, %f\n", rotation[0],rotation[1],rotation[2],rotation[3]);
   packed.unpack();
+  float norot[4] = {1,0,0,0};
+  no_rotation.pack(out, norot, frame_num);
+  no_rotation.unpack();
+  // //debugging frame latency
+  // std::string dt = std::to_string(frame_num);
   // cv::putText(packed.packed, 
   //             dt,
   //             cv::Size(10, 100),
@@ -52,17 +64,25 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   //             (210, 155, 155),
   //             4, cv::LINE_8);
 
-   namedWindow("face", cv::WINDOW_NORMAL);
-    resizeWindow("face", Size(768,384));
-    imshow("face", packed.unpacked);
-    waitKey(1);
+  //horizon line for debugging
+  cv::line(packed.unpacked, cv::Point(0,packed.unpacked.rows/2), cv::Point(packed.unpacked.cols,packed.unpacked.rows/2), cv::Scalar(0,0,255), 4, cv::LINE_8);
+  cv::line(no_rotation.unpacked, cv::Point(0,no_rotation.unpacked.rows/2), cv::Point(no_rotation.unpacked.cols,no_rotation.unpacked.rows/2), cv::Scalar(0,0,255), 4, cv::LINE_8);
+
+  //show frame
+  
+  imshow("face", packed.unpacked);
+
+  imshow("face2", no_rotation.unpacked);
+  waitKey(1);
+
+  //write to output
   video.write(packed.packed);
 
 }
 void Stream::rotationCallback(const sensor_msgs::Imu::ConstPtr& msg){
   rotation[0] = msg->orientation.w;
-  rotation[1] = -msg->orientation.x;
-  rotation[2] = -msg->orientation.y;
+  rotation[1] = msg->orientation.x;
+  rotation[2] = msg->orientation.y;
   rotation[3] = msg->orientation.z; 
 }
 void Stream::run(){
@@ -77,9 +97,9 @@ void Stream::run(){
   else{
     ROS_INFO("SUCCESS");
   }
-  // image_transport::Subscriber itSub = it.subscribe("ben/sensors/cameras/qoocam/image_raw/", 1, &Stream::imageCallback, this, image_transport::TransportHints("compressed"));
-  image_transport::Subscriber itSub = it.subscribe("in_video/", 1, &Stream::imageCallback, this, image_transport::TransportHints("compressed"));
-  // ros::Subscriber qSub= n.subscribe("/ben/sensors/posmv/orientation", 1, &Stream::rotationCallback, this);
+  image_transport::Subscriber itSub = it.subscribe("ben/sensors/cameras/qoocam/image_raw/", 1, &Stream::imageCallback, this, image_transport::TransportHints("compressed"));
+  // image_transport::Subscriber itSub = it.subscribe("in_video/", 1, &Stream::imageCallback, this, image_transport::TransportHints("compressed"));
+  ros::Subscriber qSub= n.subscribe("/ben/sensors/posmv/orientation", 1, &Stream::rotationCallback, this);
 // 
   ros::spin();
 }

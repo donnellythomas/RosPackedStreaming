@@ -132,7 +132,6 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
 
     for (int x = start; x < end; x++) {
         for (int y = 0; y < width; y++) {
-
             float u,v;
             u = uvPrecomp[faceID][x][y][0];
             v = uvPrecomp[faceID][x][y][1];
@@ -141,10 +140,13 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
             float x_rot = uvPrecomp[faceID][x][y][4];
             float y_rot = uvPrecomp[faceID][x][y][5];
             float z_rot = uvPrecomp[faceID][x][y][6];
-            float* rot_uv = new_rotation(latitude,longitude,x_rot,y_rot,z_rot, (float *)rotation, in.rows - 1,
-                              in.cols - 1);
-            u = rot_uv[0];
-            v = rot_uv[1];
+            
+            float* rot_uv = new_rotation(latitude,longitude,x_rot,y_rot,z_rot, (float *)rotation);
+            u = rot_uv[0] ;
+            v = rot_uv[1] ;
+            
+            u = u * in.cols-1;
+            v = v * in.rows-1;
 
             mx.at<float>(x-start, y) = u;
             my.at<float>(x-start, y) = v;
@@ -155,18 +157,22 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
           Scalar(0, 0, 0));
 
 } 
-float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, float *rotation, float inHeight,
-                    float inWidth) {
+float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, float *rotation) {
     // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
-    // float latitude = v * M_PI - M_PI / 2.0;
-    // float longitude = u * 2.0 * M_PI - M_PI;
     // // Create a ray from the latitude and longitude
     float p[4];
-    p[0] = 0; 
-    p[1] = x;
-    p[2] = y;
-    p[3] = z;
+    float cy = cos(z * 0.5);
+    float sy = sin(z * 0.5);
+    float cp = cos(y * 0.5);
+    float sp = sin(y * 0.5);
+    float cr = cos(x * 0.5);
+    float sr = sin(x * 0.5);
+
+    p[0] = cr * cp * cy + sr * sp * sy;
+    p[1] = sr * cp * cy - cr * sp * sy;
+    p[2] = cr * sp * cy + sr * cp * sy;
+    p[3] = cr * cp * sy - sr * sp * cy;
 
     // Rotate the ray based on the user input
     float rotationInv[4] = {rotation[0], -rotation[1], -rotation[2],
@@ -174,11 +180,33 @@ float *Pack::new_rotation(float latitude, float longitude, float x, float y, flo
     float *p_ret = quaternion_mult(
         quaternion_mult((float *)rotation, (float *)p), (float *)rotationInv);
 
-    float x_rot = p_ret[1];
-    float y_rot = p_ret[2];
-    float z_rot = p_ret[3];
+    // float x_rot = p_ret[1];
+    // float y_rot = p_ret[2];
+    // float z_rot = p_ret[3];
+    float x_rot;
+    float y_rot;
+    float z_rot;
+
+     // roll (x-axis rotation)
+    double sinr_cosp = 2 * (p_ret[0] * p_ret[1] + p_ret[2] * p_ret[3]);
+    double cosr_cosp = 1 - 2 * (p_ret[1] * p_ret[1] + p_ret[2] * p_ret[2]);
+    x_rot = std::atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = 2 * (p_ret[0] * p_ret[2] - p_ret[3] * p_ret[1]);
+    if (std::abs(sinp) >= 1)
+        y_rot = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+    else
+        y_rot = std::asin(sinp);
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (p_ret[0] * p_ret[3] + p_ret[1] * p_ret[2]);
+    double cosy_cosp = 1 - 2 * (p_ret[2] * p_ret[2] + p_ret[3] * p_ret[3]);
+    z_rot = std::atan2(siny_cosp, cosy_cosp);
+
+
     // Convert back to latitude and longitude
-    latitude = asin(y);
+    latitude = asin(y_rot);
     longitude = atan2(x_rot, z_rot);
 
     // Convert back to the normalized M_PIxel coordinate
@@ -186,8 +214,8 @@ float *Pack::new_rotation(float latitude, float longitude, float x, float y, flo
      y_rot = (latitude + M_PI / 2.0) / M_PI;
     static float uv[2];
     // Convert to xy source M_PIxel coordinate
-    uv[1] = y_rot * inHeight;
-    uv[0] = x_rot * inWidth;
+    uv[1] = y_rot;
+    uv[0] = x_rot;
 
     return uv;
 }
