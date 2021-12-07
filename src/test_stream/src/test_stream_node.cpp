@@ -83,8 +83,8 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 void Stream::rotationCallback(const sensor_msgs::Imu::ConstPtr& msg){
   rotation.m_w = msg->orientation.w;
   rotation.m_x = -msg->orientation.y;
-  rotation.m_y = msg->orientation.z;
-  rotation.m_z = msg->orientation.x; 
+  rotation.m_y = -msg->orientation.z;
+  rotation.m_z = -msg->orientation.x; 
 }
 void Stream::run(){
   //initialize node 
