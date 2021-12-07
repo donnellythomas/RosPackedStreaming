@@ -15,6 +15,7 @@ class Quaternion{
         void normalize();
         Quaternion getConjugate();
         vec3 getYawPitchRoll();
+        Quaternion getInverse();
         float m_x, m_y, m_z, m_w;
 
 };

@@ -99,11 +99,10 @@ void Quaternion::CreateMatrix(float *pMatrix)
 Quaternion Quaternion::operator *(Quaternion q)
 {
 	Quaternion r;
-	
-	r.m_x = m_w*m_x + m_x*m_w + m_y*m_z - m_z*m_y;
-	r.m_y = m_w*m_y + m_y*m_w + m_z*m_x - m_x*m_z;
-	r.m_z = m_w*m_z + m_z*m_w + m_x*m_y - m_y*m_x;
-	r.m_w = m_w*m_w - m_x*m_x - m_y*m_y - m_z*m_z;
+	r.m_x = m_w*q.m_x + m_x*q.m_w + m_y*q.m_z - m_z*q.m_y;
+	r.m_y = m_w*q.m_y + m_y*q.m_w + m_z*q.m_x - m_x*q.m_z;
+	r.m_z = m_w*q.m_z + m_z*q.m_w + m_x*q.m_y - m_y*q.m_x;
+	r.m_w = m_w*q.m_w - m_x*q.m_x - m_y*q.m_y - m_z*q.m_z;
 	
 	return(r);
 }
@@ -133,6 +132,9 @@ vec3 Quaternion::getYawPitchRoll(){
 }
 Quaternion Quaternion::getConjugate()
 {
+	return Quaternion(-m_x, -m_y, -m_z, -m_w);
+}
+Quaternion Quaternion::getInverse(){
 	return Quaternion(-m_x, -m_y, -m_z, m_w);
 }
 

@@ -151,33 +151,21 @@ vec3 PRotateZ(vec3 p, float theta)
 }
 
 float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, Quaternion rotation) {
-    // Helpful resource for this function
+     // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
     // // Create a ray from the latitude and longitude
-    // Quaternion p(x,y,z,0);
+    Quaternion p(x,y,z,0);
     // Rotate the ray based on the user input
+    Quaternion rotationInv = rotation.getInverse();
+    Quaternion result = (rotation*p)*rotationInv;
 
-    // Quaternion p_ret = ((rotation*p) * rotation.getConjugate());
-    vec3 ray(x,y,z);
-    vec3 yprRotation = rotation.getYawPitchRoll();
-    ray = PRotateX(ray, yprRotation.m_x ); //pitch
-    // ray = PRotateY(ray, yprRotation.m_z* 2.0*M_PI ); //yaw
-    ray = PRotateZ(ray, -yprRotation.m_y ); //roll
-
-    float x_rot = ray.m_x;
-    float y_rot = ray.m_y;
-    float z_rot = ray.m_z;
-    // cout<<"BEFORE:"<<" "<<x<<" "<< y<<" "<< z<<endl;
-
-    // cout<<"AFTER:"<<" "<<x_rot<<" "<< y_rot<<" "<< z_rot<<endl;
-    // exit(0);
     // Convert back to latitude and longitude
-    latitude = asin(y_rot);
-    longitude = atan2(x_rot, z_rot);
+    latitude = asin(result.m_y);
+    longitude = atan2(result.m_x, result.m_z);
 
     // Convert back to the normalized M_PIxel coordinate
-     x_rot = (longitude + M_PI) / (2.0 * M_PI);
-     y_rot = (latitude + M_PI / 2.0) / M_PI;
+    float x_rot = (longitude + M_PI) / (2.0 * M_PI);
+    float y_rot = (latitude + M_PI / 2.0) / M_PI;
     static float uv[2];
     // Convert to xy source M_PIxel coordinate
     uv[1] = y_rot;
