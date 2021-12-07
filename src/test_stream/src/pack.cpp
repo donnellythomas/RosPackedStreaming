@@ -9,41 +9,8 @@ using namespace cv;
 Pack::Pack(void){          
     packed = Mat(CUBESIZE, CUBESIZE*2+CUBESIZE*0.4f, 16);
     unpacked = Mat(CUBESIZE * 3, CUBESIZE * 4, 16);
-
+    theta = 0;
 }
-
-// float *Pack::quaternion_mult(const float q[4], const float r[4]) {
-//     static float ret[4];
-//     // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
-//     float q0 = q[0];
-//     float q1 = q[1];
-//     float q2 = q[2];
-//     float q3 = q[3];
-//     float r0 = r[0];
-//     float r1 = r[1];
-//     float r2 = r[2];
-//     float r3 = r[3];
-//     ret[0] = r0 * q0 - r1 * q1 - r2 * q2 - r3 * q3;
-//     ret[1] = r0 * q1 + r1 * q0 - r2 * q3 + r3 * q2;
-//     ret[2] = r0 * q2 + r1 * q3 + r2 * q0 - r3 * q1;
-//     ret[3] = r0 * q3 - r1 * q2 + r2 * q1 + r3 * q0;
-//     return ret;
-// }
-
-// float *Pack::quaternion_inverse(const float q[4]){
-//      static float ret[4];
-//     // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
-//     float q0 = q[0];
-//     float q1 = q[1];
-//     float q2 = q[2];
-//     float q3 = q[3];
-   
-//     ret[0] = q0;
-//     ret[1] = -q1;
-//     ret[2] = -q2;
-//     ret[3] = -q3;
-//     return ret;
-// }
 
 float* Pack::computeUV(int x, int y, int faceID ){
     // Map face pixel coordinates to [-1, 1] on plane
@@ -156,25 +123,54 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, Quaternion rotation){
           Scalar(0, 0, 0));
 
 } 
+vec3 PRotateX(vec3 p, float theta)
+{
+   vec3 q;
+   q.m_x = p.m_x;
+   q.m_y = p.m_y * cos(theta) + p.m_z * sin(theta);
+   q.m_z = -p.m_y * sin(theta) + p.m_z * cos(theta);
+   return(q);
+}
+
+vec3 PRotateY(vec3 p, float theta)
+{
+   vec3 q;
+   q.m_x = p.m_x * cos(theta) - p.m_z * sin(theta);
+   q.m_y = p.m_y;
+   q.m_z = p.m_x * sin(theta) + p.m_z * cos(theta);
+   return(q);
+}
+
+vec3 PRotateZ(vec3 p, float theta)
+{
+   vec3 q;
+   q.m_x = p.m_x * cos(theta) + p.m_y * sin(theta);
+   q.m_y = -p.m_x * sin(theta) + p.m_y * cos(theta);
+   q.m_z = p.m_z;
+   return(q);
+}
+
 float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, Quaternion rotation) {
     // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
     // // Create a ray from the latitude and longitude
-    float p[4];
-    p[0] = 0; 
-    p[1] = x;
-    p[2] = y;
-    p[3] = z;
-
+    // Quaternion p(x,y,z,0);
     // Rotate the ray based on the user input
-    // float rotationInv[4] = {rotation[0], -rotation[1], -rotation[2],
-    //                         -rotation[3]};
-    // float *p_ret = quaternion_mult(
-    //     quaternion_mult((float *)rotationInv, (float *)p), (float *)rotation);
 
-    float x_rot = p[1];
-    float y_rot = p[2];
-    float z_rot = p[3];
+    // Quaternion p_ret = ((rotation*p) * rotation.getConjugate());
+    vec3 ray(x,y,z);
+    vec3 yprRotation = rotation.getYawPitchRoll();
+    ray = PRotateX(ray, yprRotation.m_x ); //pitch
+    // ray = PRotateY(ray, yprRotation.m_z* 2.0*M_PI ); //yaw
+    ray = PRotateZ(ray, -yprRotation.m_y ); //roll
+
+    float x_rot = ray.m_x;
+    float y_rot = ray.m_y;
+    float z_rot = ray.m_z;
+    // cout<<"BEFORE:"<<" "<<x<<" "<< y<<" "<< z<<endl;
+
+    // cout<<"AFTER:"<<" "<<x_rot<<" "<< y_rot<<" "<< z_rot<<endl;
+    // exit(0);
     // Convert back to latitude and longitude
     latitude = asin(y_rot);
     longitude = atan2(x_rot, z_rot);

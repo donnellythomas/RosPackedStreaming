@@ -44,10 +44,15 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   // ROS_INFO("%d, %d", packed.packed.rows, packed.packed.cols);
   ROS_INFO("Pack time: %ld",duration.count());
   frame_num++;
-  
+  // rotation.CreateFromYawPitchRoll(0,0,0) ;
+
   packed.pack(out, rotation, frame_num);
   ROS_INFO("%f, %f, %f, %f\n", rotation.m_w,rotation.m_x,rotation.m_y,rotation.m_z);
   packed.unpack();
+  packed.theta+=10;
+  if (packed.theta>360){
+    packed.theta = 0;
+  }
   Quaternion norot;
   no_rotation.pack(out, norot, frame_num);
   no_rotation.unpack();

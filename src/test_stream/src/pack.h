@@ -10,6 +10,7 @@ class Pack {
         Mat packed;
         Mat unpacked;
         void unpack();
+        float theta;
 
     private:
         const float AN = sin(M_PI / 4);
@@ -50,10 +51,7 @@ class Pack {
         {CUBESIZE,CUBESIZE*2} //bottom
         };  
         float *new_rotation(float longitude, float latitude, float x, float y, float z, Quaternion rotation);
-        // float *quaternion_mult(const float q[4], const float r[4]) ;
-        // float *quaternion_inverse(const float q[4]);  
-        // float *CreateFromYawPitchRoll(float yaw, float pitch,
-        //                       float roll) ;
+        
         float* computeUV(int x, int y,int faceID );
         void packFace(Mat &in, Quaternion rotation, int faceID);
         };

@@ -100,10 +100,10 @@ Quaternion Quaternion::operator *(Quaternion q)
 {
 	Quaternion r;
 	
-	r.m_x = m_w*q.m_x + m_x*q.m_w + m_y*q.m_z - m_z*q.m_y;
-	r.m_y = m_w*q.m_y + m_y*q.m_w + m_z*q.m_x - m_x*q.m_z;
-	r.m_z = m_w*q.m_z + m_z*q.m_w + m_x*q.m_y - m_y*q.m_x;
-	r.m_w = m_w*q.m_w - m_x*q.m_x - m_y*q.m_y - m_z*q.m_z;
+	r.m_x = m_w*m_x + m_x*m_w + m_y*m_z - m_z*m_y;
+	r.m_y = m_w*m_y + m_y*m_w + m_z*m_x - m_x*m_z;
+	r.m_z = m_w*m_z + m_z*m_w + m_x*m_y - m_y*m_x;
+	r.m_w = m_w*m_w - m_x*m_x - m_y*m_y - m_z*m_z;
 	
 	return(r);
 }
@@ -124,9 +124,15 @@ void Quaternion::normalize()
 		m_z /= mag;      
 	}  
 }
-
+vec3 Quaternion::getYawPitchRoll(){
+	vec3 ypr;
+	ypr.m_x = atan2(2.0*(m_y*m_z + m_w*m_x), m_w*m_w - m_x*m_x - m_y*m_y + m_z*m_z);
+	ypr.m_y = asin(-2.0*(m_x*m_z - m_w*m_y));
+	ypr.m_z = atan2(2.0*(m_x*m_y + m_w*m_z), m_w*m_w + m_x*m_x - m_y*m_y - m_z*m_z);
+	return ypr;
+}
 Quaternion Quaternion::getConjugate()
 {
-	return Quaternion(-m_x, -m_y, -m_z, -m_w);
+	return Quaternion(-m_x, -m_y, -m_z, m_w);
 }
 

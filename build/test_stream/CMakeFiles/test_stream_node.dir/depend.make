@@ -3,10 +3,12 @@
 
 test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.cpp
 test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.h
+test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/vec3.h
 
 test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.h
 test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/pack.cpp
 test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/pack.h
+test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/vec3.h
 test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /usr/include/opencv4/opencv2/calib3d.hpp
 test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /usr/include/opencv4/opencv2/core.hpp
 test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /usr/include/opencv4/opencv2/core/affine.hpp
@@ -139,6 +141,7 @@ test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o: /usr/include/opencv4
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/pack.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/test_stream_node.cpp
+test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/vec3.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/cv_bridge/cv_bridge.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/geometry_msgs/Quaternion.h
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /opt/ros/noetic/include/geometry_msgs/Vector3.h
@@ -350,4 +353,7 @@ test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /usr/inc
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /usr/include/opencv4/opencv2/viz/viz3d.hpp
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /usr/include/opencv4/opencv2/viz/vizcore.hpp
 test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o: /usr/include/opencv4/opencv2/viz/widgets.hpp
+
+test_stream/CMakeFiles/test_stream_node.dir/src/vec3.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/vec3.cpp
+test_stream/CMakeFiles/test_stream_node.dir/src/vec3.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/vec3.h
 

@@ -4,6 +4,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o"
   "CMakeFiles/test_stream_node.dir/src/pack.cpp.o"
   "CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o"
+  "CMakeFiles/test_stream_node.dir/src/vec3.cpp.o"
 )
 
 # Per-language clean rules from dependency scanning.

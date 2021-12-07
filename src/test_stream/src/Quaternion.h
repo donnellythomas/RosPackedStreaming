@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "vec3.h"
 using namespace std;
 class Quaternion{
     public:
@@ -13,6 +14,7 @@ class Quaternion{
         float getMagnitude();
         void normalize();
         Quaternion getConjugate();
+        vec3 getYawPitchRoll();
         float m_x, m_y, m_z, m_w;
 
 };

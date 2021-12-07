@@ -135,7 +135,8 @@ ${OpenCV_INCLUDE_DIRS}
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/test_stream_node.cpp 
                                     src/pack.cpp src/pack.h 
-                                    src/Quaternion.cpp src/Quaternion.h )
+                                    src/Quaternion.cpp src/Quaternion.h 
+                                    src/vec3.cpp src/vec3.h)
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}

@@ -653,6 +653,33 @@ src/test_stream_node.cpp.s:
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.s
 .PHONY : src/test_stream_node.cpp.s
 
+src/vec3.o: src/vec3.cpp.o
+
+.PHONY : src/vec3.o
+
+# target to build an object file
+src/vec3.cpp.o:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/vec3.cpp.o
+.PHONY : src/vec3.cpp.o
+
+src/vec3.i: src/vec3.cpp.i
+
+.PHONY : src/vec3.i
+
+# target to preprocess a source file
+src/vec3.cpp.i:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/vec3.cpp.i
+.PHONY : src/vec3.cpp.i
+
+src/vec3.s: src/vec3.cpp.s
+
+.PHONY : src/vec3.s
+
+# target to generate assembly for a file
+src/vec3.cpp.s:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/vec3.cpp.s
+.PHONY : src/vec3.cpp.s
+
 src/video_publisher_node.o: src/video_publisher_node.cpp.o
 
 .PHONY : src/video_publisher_node.o
@@ -729,6 +756,9 @@ help:
 	@echo "... src/test_stream_node.o"
 	@echo "... src/test_stream_node.i"
 	@echo "... src/test_stream_node.s"
+	@echo "... src/vec3.o"
+	@echo "... src/vec3.i"
+	@echo "... src/vec3.s"
 	@echo "... src/video_publisher_node.o"
 	@echo "... src/video_publisher_node.i"
 	@echo "... src/video_publisher_node.s"

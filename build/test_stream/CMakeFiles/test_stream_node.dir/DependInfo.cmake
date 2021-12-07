@@ -7,6 +7,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.cpp" "/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o"
   "/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/pack.cpp" "/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o"
   "/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/test_stream_node.cpp" "/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o"
+  "/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/vec3.cpp" "/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream/CMakeFiles/test_stream_node.dir/src/vec3.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
