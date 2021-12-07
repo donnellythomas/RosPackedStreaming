@@ -2,7 +2,6 @@
 #include <opencv2/opencv.hpp>
 #include <chrono>
 #include "pack.h"
-
 #include <thread>
 using namespace std::chrono;
 using namespace std;
@@ -13,38 +12,38 @@ Pack::Pack(void){
 
 }
 
-float *Pack::quaternion_mult(const float q[4], const float r[4]) {
-    static float ret[4];
-    // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
-    float q0 = q[0];
-    float q1 = q[1];
-    float q2 = q[2];
-    float q3 = q[3];
-    float r0 = r[0];
-    float r1 = r[1];
-    float r2 = r[2];
-    float r3 = r[3];
-    ret[0] = r0 * q0 - r1 * q1 - r2 * q2 - r3 * q3;
-    ret[1] = r0 * q1 + r1 * q0 - r2 * q3 + r3 * q2;
-    ret[2] = r0 * q2 + r1 * q3 + r2 * q0 - r3 * q1;
-    ret[3] = r0 * q3 - r1 * q2 + r2 * q1 + r3 * q0;
-    return ret;
-}
+// float *Pack::quaternion_mult(const float q[4], const float r[4]) {
+//     static float ret[4];
+//     // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
+//     float q0 = q[0];
+//     float q1 = q[1];
+//     float q2 = q[2];
+//     float q3 = q[3];
+//     float r0 = r[0];
+//     float r1 = r[1];
+//     float r2 = r[2];
+//     float r3 = r[3];
+//     ret[0] = r0 * q0 - r1 * q1 - r2 * q2 - r3 * q3;
+//     ret[1] = r0 * q1 + r1 * q0 - r2 * q3 + r3 * q2;
+//     ret[2] = r0 * q2 + r1 * q3 + r2 * q0 - r3 * q1;
+//     ret[3] = r0 * q3 - r1 * q2 + r2 * q1 + r3 * q0;
+//     return ret;
+// }
 
-float *Pack::quaternion_inverse(const float q[4]){
-     static float ret[4];
-    // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
-    float q0 = q[0];
-    float q1 = q[1];
-    float q2 = q[2];
-    float q3 = q[3];
+// float *Pack::quaternion_inverse(const float q[4]){
+//      static float ret[4];
+//     // printf("before1 w: %f, X: %f, Y: %f, Z: %f\n", q[0], q[1], q[2], q[3]);
+//     float q0 = q[0];
+//     float q1 = q[1];
+//     float q2 = q[2];
+//     float q3 = q[3];
    
-    ret[0] = q0;
-    ret[1] = -q1;
-    ret[2] = -q2;
-    ret[3] = -q3;
-    return ret;
-}
+//     ret[0] = q0;
+//     ret[1] = -q1;
+//     ret[2] = -q2;
+//     ret[3] = -q3;
+//     return ret;
+// }
 
 float* Pack::computeUV(int x, int y, int faceID ){
     // Map face pixel coordinates to [-1, 1] on plane
@@ -112,7 +111,7 @@ float* Pack::computeUV(int x, int y, int faceID ){
     precomp[6] = cos(latitude) * cos(longitude);
     return precomp;
 }
-void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
+void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, Quaternion rotation){
     int width = face.cols;
     int height = face.rows;
     Mat mx(height,width,CV_32F);
@@ -141,7 +140,7 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
             float y_rot = uvPrecomp[faceID][x][y][5];
             float z_rot = uvPrecomp[faceID][x][y][6];
             
-            float* rot_uv = new_rotation(latitude,longitude,x_rot,y_rot,z_rot, (float *)rotation);
+            float* rot_uv = new_rotation(latitude,longitude,x_rot,y_rot,z_rot, rotation);
             u = rot_uv[0] ;
             v = rot_uv[1] ;
             
@@ -157,54 +156,25 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, float rotation[4]){
           Scalar(0, 0, 0));
 
 } 
-float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, float *rotation) {
+float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, Quaternion rotation) {
     // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
     // // Create a ray from the latitude and longitude
     float p[4];
-    float cy = cos(z * 0.5);
-    float sy = sin(z * 0.5);
-    float cp = cos(y * 0.5);
-    float sp = sin(y * 0.5);
-    float cr = cos(x * 0.5);
-    float sr = sin(x * 0.5);
-
-    p[0] = cr * cp * cy + sr * sp * sy;
-    p[1] = sr * cp * cy - cr * sp * sy;
-    p[2] = cr * sp * cy + sr * cp * sy;
-    p[3] = cr * cp * sy - sr * sp * cy;
+    p[0] = 0; 
+    p[1] = x;
+    p[2] = y;
+    p[3] = z;
 
     // Rotate the ray based on the user input
-    float rotationInv[4] = {rotation[0], -rotation[1], -rotation[2],
-                            -rotation[3]};
-    float *p_ret = quaternion_mult(
-        quaternion_mult((float *)rotation, (float *)p), (float *)rotationInv);
+    // float rotationInv[4] = {rotation[0], -rotation[1], -rotation[2],
+    //                         -rotation[3]};
+    // float *p_ret = quaternion_mult(
+    //     quaternion_mult((float *)rotationInv, (float *)p), (float *)rotation);
 
-    // float x_rot = p_ret[1];
-    // float y_rot = p_ret[2];
-    // float z_rot = p_ret[3];
-    float x_rot;
-    float y_rot;
-    float z_rot;
-
-     // roll (x-axis rotation)
-    double sinr_cosp = 2 * (p_ret[0] * p_ret[1] + p_ret[2] * p_ret[3]);
-    double cosr_cosp = 1 - 2 * (p_ret[1] * p_ret[1] + p_ret[2] * p_ret[2]);
-    x_rot = std::atan2(sinr_cosp, cosr_cosp);
-
-    // pitch (y-axis rotation)
-    double sinp = 2 * (p_ret[0] * p_ret[2] - p_ret[3] * p_ret[1]);
-    if (std::abs(sinp) >= 1)
-        y_rot = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
-    else
-        y_rot = std::asin(sinp);
-
-    // yaw (z-axis rotation)
-    double siny_cosp = 2 * (p_ret[0] * p_ret[3] + p_ret[1] * p_ret[2]);
-    double cosy_cosp = 1 - 2 * (p_ret[2] * p_ret[2] + p_ret[3] * p_ret[3]);
-    z_rot = std::atan2(siny_cosp, cosy_cosp);
-
-
+    float x_rot = p[1];
+    float y_rot = p[2];
+    float z_rot = p[3];
     // Convert back to latitude and longitude
     latitude = asin(y_rot);
     longitude = atan2(x_rot, z_rot);
@@ -220,14 +190,14 @@ float *Pack::new_rotation(float latitude, float longitude, float x, float y, flo
     return uv;
 }
 
-void Pack::packFace(Mat &in, float rotation[4], int faceID){
+void Pack::packFace(Mat &in, Quaternion rotation, int faceID){
     int height = packedCoords[faceID][4];
     int width = packedCoords[faceID][5];
     Mat packedFace =  Mat(height, width, in.type());
     computeFaceMap(in, packedFace, faceID, rotation);
     packedFace.copyTo(packed(Rect(packedCoords[faceID][2],  packedCoords[faceID][3],packedFace.cols, packedFace.rows)));
 }
-void Pack::pack(Mat &in, float rotation[4], int frame_num){
+void Pack::pack(Mat &in, Quaternion rotation, int frame_num){
     int height, width;
     //compute all faces
     int horizon[4] = {1,4,7,10};

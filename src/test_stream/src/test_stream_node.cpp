@@ -6,6 +6,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include "sensor_msgs/Imu.h"
 #include <chrono>
+// #include "Quaternion.h"
 #include "pack.h"
 
 class Stream{
@@ -16,7 +17,7 @@ class Stream{
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     void rotationCallback(const sensor_msgs::Imu::ConstPtr& msg);
     void run();
-    float rotation[4];
+    Quaternion rotation;
     int frame_num;
     Pack packed;
     Pack no_rotation;
@@ -24,11 +25,6 @@ class Stream{
 Stream::Stream(void){
     // video = cv::VideoWriter("appsrc  ! videoconvert ! video/x-raw !  x264enc  ! rtph264pay ! udpsink host=127.0.0.1 port=5000",cv::CAP_GSTREAMER,0, 10, cv::Size(2304,960), true); //Size(1440,160)
     video = cv::VideoWriter("out.mp4",VideoWriter::fourcc('H','V','C','1'),30, Size(2880,1920));
-
-    rotation[0] = 1;
-    rotation[1] = 0;
-    rotation[2] = 0;
-    rotation[3] = 0;
     frame_num = 0;
     packed.precompute();
     no_rotation.precompute();
@@ -50,9 +46,9 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   frame_num++;
   
   packed.pack(out, rotation, frame_num);
-  ROS_INFO("%f, %f, %f, %f\n", rotation[0],rotation[1],rotation[2],rotation[3]);
+  ROS_INFO("%f, %f, %f, %f\n", rotation.m_w,rotation.m_x,rotation.m_y,rotation.m_z);
   packed.unpack();
-  float norot[4] = {1,0,0,0};
+  Quaternion norot;
   no_rotation.pack(out, norot, frame_num);
   no_rotation.unpack();
   // //debugging frame latency
@@ -80,10 +76,10 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 
 }
 void Stream::rotationCallback(const sensor_msgs::Imu::ConstPtr& msg){
-  rotation[0] = msg->orientation.w;
-  rotation[1] = msg->orientation.x;
-  rotation[2] = msg->orientation.y;
-  rotation[3] = msg->orientation.z; 
+  rotation.m_w = msg->orientation.w;
+  rotation.m_x = msg->orientation.x;
+  rotation.m_y = msg->orientation.y;
+  rotation.m_z = msg->orientation.z; 
 }
 void Stream::run(){
   //initialize node 

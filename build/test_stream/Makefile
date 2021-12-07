@@ -572,6 +572,33 @@ rosgraph_msgs_generate_messages_cpp/fast:
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make test_stream/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
 .PHONY : rosgraph_msgs_generate_messages_cpp/fast
 
+src/Quaternion.o: src/Quaternion.cpp.o
+
+.PHONY : src/Quaternion.o
+
+# target to build an object file
+src/Quaternion.cpp.o:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o
+.PHONY : src/Quaternion.cpp.o
+
+src/Quaternion.i: src/Quaternion.cpp.i
+
+.PHONY : src/Quaternion.i
+
+# target to preprocess a source file
+src/Quaternion.cpp.i:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.i
+.PHONY : src/Quaternion.cpp.i
+
+src/Quaternion.s: src/Quaternion.cpp.s
+
+.PHONY : src/Quaternion.s
+
+# target to generate assembly for a file
+src/Quaternion.cpp.s:
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build && $(MAKE) -f test_stream/CMakeFiles/test_stream_node.dir/build.make test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.s
+.PHONY : src/Quaternion.cpp.s
+
 src/pack.o: src/pack.cpp.o
 
 .PHONY : src/pack.o
@@ -693,6 +720,9 @@ help:
 	@echo "... rosgraph_msgs_generate_messages_cpp"
 	@echo "... test"
 	@echo "... edit_cache"
+	@echo "... src/Quaternion.o"
+	@echo "... src/Quaternion.i"
+	@echo "... src/Quaternion.s"
 	@echo "... src/pack.o"
 	@echo "... src/pack.i"
 	@echo "... src/pack.s"

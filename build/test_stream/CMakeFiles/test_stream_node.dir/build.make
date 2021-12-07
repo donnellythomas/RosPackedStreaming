@@ -83,16 +83,31 @@ test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test_stream_node.dir/src/pack.cpp.s"
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/pack.cpp -o CMakeFiles/test_stream_node.dir/src/pack.cpp.s
 
+test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o: test_stream/CMakeFiles/test_stream_node.dir/flags.make
+test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o: /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o"
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o -c /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.cpp
+
+test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.i"
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.cpp > CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.i
+
+test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.s"
+	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/src/test_stream/src/Quaternion.cpp -o CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.s
+
 # Object files for target test_stream_node
 test_stream_node_OBJECTS = \
 "CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o" \
-"CMakeFiles/test_stream_node.dir/src/pack.cpp.o"
+"CMakeFiles/test_stream_node.dir/src/pack.cpp.o" \
+"CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o"
 
 # External object files for target test_stream_node
 test_stream_node_EXTERNAL_OBJECTS =
 
 /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: test_stream/CMakeFiles/test_stream_node.dir/src/test_stream_node.cpp.o
 /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: test_stream/CMakeFiles/test_stream_node.dir/src/pack.cpp.o
+/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: test_stream/CMakeFiles/test_stream_node.dir/src/Quaternion.cpp.o
 /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: test_stream/CMakeFiles/test_stream_node.dir/build.make
 /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: /opt/ros/noetic/lib/libimage_transport.so
 /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: /opt/ros/noetic/lib/libmessage_filters.so
@@ -186,7 +201,7 @@ test_stream_node_EXTERNAL_OBJECTS =
 /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: /usr/local/lib/libopencv_imgproc.so.4.5.4
 /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: /usr/local/lib/libopencv_core.so.4.5.4
 /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node: test_stream/CMakeFiles/test_stream_node.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/devel/lib/test_stream/test_stream_node"
 	cd /home/thomasdonnelly/School/Thesis/test_project/catkin_ws/build/test_stream && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/test_stream_node.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
