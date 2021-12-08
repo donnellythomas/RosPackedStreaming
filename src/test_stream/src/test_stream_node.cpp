@@ -42,12 +42,17 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   // ROS_INFO("%d, %d", packed.packed.rows, packed.packed.cols);
-  ROS_INFO("Pack time: %ld",duration.count());
+  // ROS_INFO("Pack time: %ld",duration.count());
   frame_num++;
   // rotation.CreateFromYawPitchRoll(0,0,0) ;
-
+  Quaternion curRot = rotation;
+  ROS_INFO("W: %f X: %f Y: %f Z: %f\n", curRot.m_w,curRot.m_x,curRot.m_y,curRot.m_z);
+  Quaternion rot = curRot;
+  vec3 ypr = rot.getYawPitchRoll();
+  ROS_INFO("Yaw: %f, Pitch: %f, ROLL: %f", ypr.m_x*( 180/M_PI), ypr.m_y*( 180/M_PI), ypr.m_z*( 180/M_PI));
+  
   packed.pack(out, rotation, frame_num);
-  ROS_INFO("%f, %f, %f, %f\n", rotation.m_w,rotation.m_x,rotation.m_y,rotation.m_z);
+  
   packed.unpack();
   packed.theta+=10;
   if (packed.theta>360){
@@ -83,8 +88,8 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 void Stream::rotationCallback(const sensor_msgs::Imu::ConstPtr& msg){
   rotation.m_w = msg->orientation.w;
   rotation.m_x = -msg->orientation.y;
-  rotation.m_y = -msg->orientation.z;
-  rotation.m_z = -msg->orientation.x; 
+  rotation.m_y = msg->orientation.z;
+  rotation.m_z = msg->orientation.x; 
 }
 void Stream::run(){
   //initialize node 

@@ -8,7 +8,7 @@ class Quaternion{
         ~Quaternion();
         void reset();
         void CreateFromAxisAngle(float x, float y, float z, float degrees);
-        void CreateFromYawPitchRoll(double yaw, double pitch, double roll); // yaw (Z), pitch (Y), roll (X)
+        void CreateFromYawPitchRoll(double yaw, double pitch, double roll);
         void CreateMatrix(float *pMatrix);
         Quaternion operator *(Quaternion q);
         float getMagnitude();

@@ -154,9 +154,17 @@ float *Pack::new_rotation(float latitude, float longitude, float x, float y, flo
      // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
     // // Create a ray from the latitude and longitude
-    Quaternion p(x,y,z,0);
-    // Rotate the ray based on the user input
+    vec3 ypr= rotation.getYawPitchRoll();
+    Quaternion yaw;
+    yaw.CreateFromYawPitchRoll(0,ypr.m_y,0);
+    rotation = rotation*yaw.getConjugate();
+
+    Quaternion new_rotate(0,0,0,1);
+    new_rotate.CreateFromYawPitchRoll(0,M_PI,0); //roll Z, yaw Y, righthand pitch X 
+    rotation = rotation * new_rotate;
     Quaternion rotationInv = rotation.getInverse();
+    // Rotate the ray based on the user input
+    Quaternion p(x,y,z,0);
     Quaternion result = (rotation*p)*rotationInv;
 
     // Convert back to latitude and longitude
