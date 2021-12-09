@@ -28,10 +28,10 @@ Stream::Stream(void){
     frame_num = 0;
     packed.precompute();
     no_rotation.precompute();
-    namedWindow("face", cv::WINDOW_NORMAL);
-    resizeWindow("face", Size(768,384));
-    namedWindow("face2", cv::WINDOW_NORMAL);
-    resizeWindow("face2", Size(768,384));
+    namedWindow("Stabilized", cv::WINDOW_NORMAL);
+    resizeWindow("Stabilized", Size(768,384));
+    namedWindow("Original", cv::WINDOW_NORMAL);
+    resizeWindow("Original", Size(768,384));
 
 }
 void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -44,12 +44,12 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   // ROS_INFO("%d, %d", packed.packed.rows, packed.packed.cols);
   // ROS_INFO("Pack time: %ld",duration.count());
   frame_num++;
-  // rotation.CreateFromYawPitchRoll(0,0,0) ;
+  // rotation.CreateFromRollYawPitch(0,0,0) ;
   Quaternion curRot = rotation;
   ROS_INFO("W: %f X: %f Y: %f Z: %f\n", curRot.m_w,curRot.m_x,curRot.m_y,curRot.m_z);
   Quaternion rot = curRot;
-  vec3 ypr = rot.getYawPitchRoll();
-  ROS_INFO("Yaw: %f, Pitch: %f, ROLL: %f", ypr.m_x*( 180/M_PI), ypr.m_y*( 180/M_PI), ypr.m_z*( 180/M_PI));
+  vec3 ypr = rot.getRollYawPitch();
+  ROS_INFO("pitch: %f, yaw: %f, roll: %f", ypr.m_x*( 180/M_PI), ypr.m_y*( 180/M_PI), ypr.m_z*( 180/M_PI));
   
   packed.pack(out, rotation, frame_num);
   
@@ -76,9 +76,9 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 
   //show frame
   
-  imshow("face", packed.unpacked);
+  imshow("Stabilized", packed.unpacked);
 
-  imshow("face2", no_rotation.unpacked);
+  imshow("Original", no_rotation.unpacked);
   waitKey(1);
 
   //write to output
@@ -87,8 +87,8 @@ void Stream::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 }
 void Stream::rotationCallback(const sensor_msgs::Imu::ConstPtr& msg){
   rotation.m_w = msg->orientation.w;
-  rotation.m_x = -msg->orientation.y;
-  rotation.m_y = msg->orientation.z;
+  rotation.m_x = msg->orientation.y;
+  rotation.m_y = -msg->orientation.z;
   rotation.m_z = msg->orientation.x; 
 }
 void Stream::run(){

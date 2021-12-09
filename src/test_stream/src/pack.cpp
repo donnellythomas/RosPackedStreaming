@@ -123,49 +123,46 @@ void Pack::computeFaceMap(Mat &in, Mat &face, int faceID, Quaternion rotation){
           Scalar(0, 0, 0));
 
 } 
-vec3 PRotateX(vec3 p, float theta)
-{
-   vec3 q;
-   q.m_x = p.m_x;
-   q.m_y = p.m_y * cos(theta) + p.m_z * sin(theta);
-   q.m_z = -p.m_y * sin(theta) + p.m_z * cos(theta);
-   return(q);
-}
-
-vec3 PRotateY(vec3 p, float theta)
-{
-   vec3 q;
-   q.m_x = p.m_x * cos(theta) - p.m_z * sin(theta);
-   q.m_y = p.m_y;
-   q.m_z = p.m_x * sin(theta) + p.m_z * cos(theta);
-   return(q);
-}
-
-vec3 PRotateZ(vec3 p, float theta)
-{
-   vec3 q;
-   q.m_x = p.m_x * cos(theta) + p.m_y * sin(theta);
-   q.m_y = -p.m_x * sin(theta) + p.m_y * cos(theta);
-   q.m_z = p.m_z;
-   return(q);
-}
 
 float *Pack::new_rotation(float latitude, float longitude, float x, float y, float z, Quaternion rotation) {
      // Helpful resource for this function
     // https://github.com/DanielArnett/360-VJ/blob/d50b68d522190c726df44147c5301a7159bf6c86/ShaderMaker.cpp#L678
     // // Create a ray from the latitude and longitude
-    vec3 ypr= rotation.getYawPitchRoll();
-    Quaternion yaw;
-    yaw.CreateFromYawPitchRoll(0,ypr.m_y,0);
-    rotation = rotation*yaw.getConjugate();
 
-    Quaternion new_rotate(0,0,0,1);
-    new_rotate.CreateFromYawPitchRoll(0,M_PI,0); //roll Z, yaw Y, righthand pitch X 
-    rotation = rotation * new_rotate;
-    Quaternion rotationInv = rotation.getInverse();
+    // //testing quaternion
+    // Quaternion zyx;
+    // zyx.CreateFromRollYawPitch(1.588, 0.733,0.401);//zyx
+    // Quaternion extractYaw = zyx;
+    // extractYaw.m_x = 0;
+    // extractYaw.m_y = 0;
+    // extractYaw.normalize();
+    // // extractYaw.CreateFromRollYawPitch(1.588,0,0);
+    // zyx = zyx * extractYaw.getConjugate();
+    // vec3 test = zyx.getRollYawPitch();
+    // cout<<zyx.m_w << " " <<zyx.m_x<<" "<<zyx.m_y<< " " <<zyx.m_z<<endl;
+    // cout<<test.m_x<<" "<<test.m_y<< " " <<test.m_z<<endl;
+
+    // // Quaternion extractYaw;
+    // // extractYaw.CreateFromRollYawPitch(1.588,0,0);
+    // // extractYaw = extractYaw*extractYaw.getConjugate();
+    // // vec3 yawVec3 = extractYaw.getRollYawPitch();
+    // // cout<<extractYaw.m_w << " " <<extractYaw.m_x<<" "<<extractYaw.m_y<< " " <<extractYaw.m_z<<endl;
+    // // cout<<yawVec3.m_x<<" "<<yawVec3.m_y<< " " <<yawVec3.m_z<<endl;
+
+    // exit(0);
+    // rotation.CreateFromRollYawPitch(0,0,0); //roll yaw pitch
+    Quaternion align;
+    align.CreateFromRollYawPitch(0,M_PI,0);
+    rotation = rotation * align;
+    Quaternion ignore_yaw = rotation;
+    ignore_yaw.m_x = 0;
+    ignore_yaw.m_z = 0;
+    ignore_yaw.normalize();
+    rotation = rotation*ignore_yaw.getConjugate();
+    Quaternion rotationConj = rotation.getConjugate();
     // Rotate the ray based on the user input
     Quaternion p(x,y,z,0);
-    Quaternion result = (rotation*p)*rotationInv;
+    Quaternion result = (rotationConj*p)*rotation;
 
     // Convert back to latitude and longitude
     latitude = asin(result.m_y);

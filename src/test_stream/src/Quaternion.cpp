@@ -48,7 +48,7 @@ void Quaternion::CreateFromAxisAngle(float x, float y, float z, float degrees)
 }
 
 
-void Quaternion::CreateFromYawPitchRoll(double yaw, double pitch, double roll) // yaw (Z), pitch (Y), roll (X)
+void Quaternion::CreateFromRollYawPitch(double yaw, double pitch, double roll) // yaw (Z), pitch (Y), roll (X)
 {
 	// Abbreviations for the various angular functions
 	double cy = cos(yaw * 0.5);
@@ -123,18 +123,29 @@ void Quaternion::normalize()
 		m_z /= mag;      
 	}  
 }
-vec3 Quaternion::getYawPitchRoll(){
-	vec3 ypr;
-	ypr.m_x = atan2(2.0*(m_y*m_z + m_w*m_x), m_w*m_w - m_x*m_x - m_y*m_y + m_z*m_z);
-	ypr.m_y = asin(-2.0*(m_x*m_z - m_w*m_y));
-	ypr.m_z = atan2(2.0*(m_x*m_y + m_w*m_z), m_w*m_w + m_x*m_x - m_y*m_y - m_z*m_z);
-	return ypr;
+vec3 Quaternion::getRollYawPitch() {
+    vec3 angles;
+
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (m_w * m_x + m_y * m_z);
+    double cosr_cosp = 1 - 2 * (m_x * m_x + m_y * m_y);
+    angles.m_x = std::atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = 2 * (m_w * m_y - m_z * m_x);
+    if (std::abs(sinp) >= 1)
+        angles.m_y = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+    else
+        angles.m_y = std::asin(sinp);
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (m_w * m_z + m_x * m_y);
+    double cosy_cosp = 1 - 2 * (m_y * m_y + m_z * m_z);
+    angles.m_z = std::atan2(siny_cosp, cosy_cosp);
+
+    return angles;
 }
 Quaternion Quaternion::getConjugate()
 {
-	return Quaternion(-m_x, -m_y, -m_z, -m_w);
-}
-Quaternion Quaternion::getInverse(){
 	return Quaternion(-m_x, -m_y, -m_z, m_w);
 }
-
